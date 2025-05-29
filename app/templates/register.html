@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h2>Create an Account</h2>
+<form method="POST">
+  <input type="text" name="username" placeholder="Username" required><br><br>
+  <input type="password" name="password" placeholder="Password" required><br><br>
+
+  <label for="role">Role:</label>
+  <select name="role" required>
+    <option value="technician">Technician</option>
+    <option value="finance">Finance</option>
+    <option value="manager">Manager</option>
+  </select><br><br>
+
+  <input type="text" name="name" placeholder="Full name" required><br><br>
+  <input type="email" name="email" placeholder="Email"><br><br>
+  <input type="text" name="phone" placeholder="Phone"><br><br>
+
+  <input type="submit" value="Register">
+</form>
+<a href="{{ url_for('main.login') }}">Back to login</a>
+{% endblock %}

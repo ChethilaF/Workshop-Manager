@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Technicians{% endblock %}
+
+{% block content %}
+<h2>Technician List</h2>
+
+{% if current_user.role == 'admin' %}
+<a href="{{ url_for('main.add_technician') }}">Add New Technician</a>
+{% endif %}
+
+<ul>
+  {% for tech in technicians %}
+  <li>
+    {{ tech.name }} — {{ tech.email }} — {{ tech.phone }} — {{ tech.specialization }}
+
+    {% if current_user.role == 'admin' %}
+    <br>
+    <a href="{{ url_for('main.edit_technician', technician_id=tech.id) }}">Edit</a>
+    |
+    <form action="{{ url_for('main.delete_technician', technician_id=tech.id) }}" method="POST" style="display:inline;">
+      <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+    </form>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

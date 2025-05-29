@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}Edit Technician{% endblock %}
+
+{% block content %}
+<h2>Edit Technician</h2>
+<form method="POST">
+  <input type="text" name="name" value="{{ technician.name }}" required><br><br>
+  <input type="email" name="email" value="{{ technician.email }}"><br><br>
+  <input type="text" name="phone" value="{{ technician.phone }}"><br><br>
+  <input type="text" name="specialization" value="{{ technician.specialization }}"><br><br>
+  <input type="submit" value="Update Technician">
+</form>
+<a href="{{ url_for('main.technicians') }}">← Back to Technicians</a>
+{% endblock %}

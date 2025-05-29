@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}Add Job{% endblock %}
+
+{% block content %}
+<h2>Add New Job</h2>
+<form method="POST">
+    <input type="text" name="description" placeholder="Job description" required><br><br>
+
+    <label>Start Date:</label>
+    <input type="date" name="start_date"><br><br>
+
+    <label>End Date:</label>
+    <input type="date" name="end_date"><br><br>
+
+    <label>Status:</label>
+    <select name="status">
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+    </select><br><br>
+
+    <label>Total Cost ($):</label>
+    <input type="number" name="total_cost" step="0.01"><br><br>
+
+    <label>Customer:</label>
+    <select name="customer_id">
+        {% for customer in customers %}
+        <option value="{{ customer.id }}">{{ customer.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Technician:</label>
+    <select name="technician_id">
+        {% for tech in technicians %}
+        <option value="{{ tech.id }}">{{ tech.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="vehicle_registration">Vehicle Registration:</label><br>
+    <input type="text" name="vehicle_registration" placeholder="e.g. ABC123" required><br><br>
+
+
+    <input type="submit" value="Add Job">
+</form>
+{% endblock %}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Workshop Manager{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <h1>Workshop Manager</h1>
+        <nav>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('main.technician_dashboard') }}">Technician Dashboard</a>
+            <a href="{{ url_for('main.customers') }}">Customers</a>
+            <a href="{{ url_for('main.technicians') }}">Technicians</a>
+            <a href="{{ url_for('main.jobs') }}">Jobs</a>
+            <a href="{{ url_for('main.logout') }}">Logout</a>
+            {% else %}
+            <a href="{{ url_for('main.login') }}">Login</a>
+            <a href="{{ url_for('main.register') }}">Register</a>
+            {% endif %}
+        </nav>
+    
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <hr>
+        <p style="text-align:center;">&copy; 2025 Workshop Manager</p>
+    </footer>
+</body>
+
+</html>

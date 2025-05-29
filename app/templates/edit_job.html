@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block title %}Edit Job{% endblock %}
+
+{% block content %}
+<h2>Edit Job</h2>
+<form method="POST">
+    <input type="text" name="description" value="{{ job.description }}" required><br><br>
+
+    <label>Start Date:</label>
+    <input type="date" name="start_date" value="{{ job.start_date }}"><br><br>
+
+    <label>End Date:</label>
+    <input type="date" name="end_date" value="{{ job.end_date }}"><br><br>
+
+    <label>Status:</label>
+    <select name="status">
+        <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
+    </select><br><br>
+
+    <label>Total Cost ($):</label>
+    <input type="number" name="total_cost" step="0.01" value="{{ job.total_cost }}"><br><br>
+
+    <label>Customer:</label>
+    <select name="customer_id">
+        {% for customer in customers %}
+        <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>
+            {{ customer.name }}
+        </option>
+        {% endfor %}
+    </select><br><br>
+    
+    <label>Technician:</label>
+    <select name="technician_id">
+        {% for tech in technicians %}
+        <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>
+            {{ tech.name }}
+        </option>
+        {% endfor %}
+    </select><br><br>
+    
+    <label for="vehicle_registration">Vehicle Registration:</label><br>
+    <input type="text" name="vehicle_registration" value="{{ job.vehicle_registration }}" required><br><br>
+
+
+    <input type="submit" value="Update Job">
+</form>
+{% endblock %}

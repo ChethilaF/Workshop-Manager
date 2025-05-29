@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div style="text-align: center;">
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
+  <h1>Welcome to the Workshop Management System</h1>
+  <p>Please sign in to continue.</p>
+
+  <form method="POST" style="display: inline-block; text-align: left; margin-top: 20px;">
+    <label>Username:</label><br>
+    <input type="text" name="username" required><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" name="password" required><br><br>
+
+    <input type="submit" value="Sign In">
+  </form>
+
+  <p style="margin-top: 20px;">
+    Don’t have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+  </p>
+</div>
+{% endblock %}
