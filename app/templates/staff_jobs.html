@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Jobs for {{ technician.name }}{% endblock %}
+{% block content %}
+<h2>Jobs assigned to {{ technician.name }}</h2>
+{% if jobs %}
+<ul>
+  {% for job in jobs %}
+  <li>
+    <strong>{{ job.description }}</strong><br>
+    Status: {{ job.status }}<br>
+    Start: {{ job.start_date }} | End: {{ job.end_date }} | Cost: ${{ job.total_cost }}<br>
+    Customer: {{ job.customer.name }}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}<p>No jobs assigned yet.</p>{% endif %}
+{% endblock %}

@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
-{% block title %}Add Customer{% endblock %}
+{% block title %}Add Technician{% endblock %}
 {% block content %}
-<h2>Add New Customer</h2>
+<h2>Add New Technician</h2>
 <form method="POST">
     <input type="text" name="name" placeholder="Full name" required><br><br>
     <input type="email" name="email" placeholder="Email"><br><br>
     <input type="text" name="phone" placeholder="Phone"><br><br>
-    <input type="text" name="address" placeholder="Address"><br><br>
-    <input type="submit" value="Add Customer">
+    <input type="text" name="specialization" placeholder="Specialization"><br><br>
+    <input type="submit" value="Add Technician">
 </form>
 <br>
-<a href="{{ url_for('main.customers') }}">← Back to Customers</a>
+<a href="{{ url_for('main.technicians') }}">← Back to Technicians</a>
 {% endblock %}

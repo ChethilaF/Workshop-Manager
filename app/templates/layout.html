@@ -1,39 +1,56 @@
-<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Workshop Manager{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
-    <header>
-        <h1>Workshop Manager</h1>
-        <nav>
+    <div class="sidebar" id="sidebar">
+        <div class="logo">🔧 Workshop Manager</div>
+        <ul>
             {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-            <a href="{{ url_for('main.technician_dashboard') }}">Technician Dashboard</a>
-            <a href="{{ url_for('main.customers') }}">Customers</a>
-            <a href="{{ url_for('main.technicians') }}">Technicians</a>
-            <a href="{{ url_for('main.jobs') }}">Jobs</a>
-            <a href="{{ url_for('main.logout') }}">Logout</a>
+            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            {% if current_user.role == 'admin' %}
+            <li><a href="{{ url_for('main.customers') }}">Customers</a></li>
+            <li><a href="{{ url_for('main.technicians') }}">Technicians</a></li>
+            <li><a href="{{ url_for('main.jobs') }}">Jobs</a></li>
+            <li><a href="{{ url_for('main.staff_dashboard') }}">Staff</a></li>
+            {% elif current_user.role == 'technician' %}
+            <li><a href="{{ url_for('main.technician_dashboard') }}">My Jobs</a></li>
+            {% elif current_user.role == 'finance' %}
+            <li><a href="#">Finance Panel</a></li>
+            {% elif current_user.role == 'manager' %}
+            <li><a href="#">Manager View</a></li>
+            {% endif %}        
+            <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
             {% else %}
-            <a href="{{ url_for('main.login') }}">Login</a>
-            <a href="{{ url_for('main.register') }}">Register</a>
+            <li><a href="{{ url_for('main.login') }}">Login</a></li>
             {% endif %}
-        </nav>
-    
-    </header>
+        </ul>
+    </div>
 
-    <main>
+    <div class="main-content">
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+            <li class="flash {{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
-    </main>
+    </div>
 
-    <footer>
-        <hr>
-        <p style="text-align:center;">&copy; 2025 Workshop Manager</p>
-    </footer>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+    </script>
 </body>
 
 </html>

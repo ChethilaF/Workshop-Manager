@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block title %}Job Control{% endblock %}
+{% block content %}
+<h2>Job: {{ job.description }}</h2>
+<p><strong>Vehicle Reg:</strong> {{ job.vehicle_registration }}</p>
+<p><strong>Status:</strong> {{ job.status }}</p>
+<p><strong>Timer:</strong> <span id="liveTimer">00:00:00</span></p>
+<p><strong>Current Time:</strong> <span id="currentTime">Loading...</span></p>
+<p><strong>Target Duration:</strong> 01:30:00</p>
+<input type="hidden" id="jobStart" value="{{ job.start_time.isoformat() if job.start_time else '' }}">
+<input type="hidden" id="totalWork" value="{{ job.total_work_duration or 0 }}">
+<input type="hidden" id="jobStatus" value="{{ job.status }}">
+<form method="POST"><input type="hidden" name="action" value="start"><button type="submit">Start Job</button></form>
+<form method="POST" onsubmit="stopTimer();">
+  <input type="hidden" name="action" value="pause">
+  <div id="pauseReasonBox" style="display:none;">
+    <label>Reason for pause:</label>
+    <input type="text" name="pause_reason" placeholder="Enter reason" required>
+  </div>
+  <button type="button" onclick="togglePauseReason()">Pause Job</button>
+</form>
+<form method="POST"><input type="hidden" name="action" value="resume"><button type="submit">Resume Job</button></form>
+<form method="POST"><input type="hidden" name="action" value="stop"><button type="submit"
+    style="background:red;color:white;">Stop Job</button></form>
+<h3>Pause History:</h3>
+{% if job.pauses %}
+<ul>
+  {% for p in job.pauses %}
+  <li>Paused: {{ p.paused_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>Resumed: {{ p.resumed_at.strftime('%Y-%m-%d %H:%M:%S')
+    if p.resumed_at else 'Not resumed yet' }}<br>Reason: {{ p.reason }}</li>
+  {% endfor %}
+</ul>
+{% else %}<p>No pauses recorded.</p>{% endif %}
+<script>
+  function formatTime(seconds) {
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
+  function togglePauseReason() {
+    const box = document.getElementById("pauseReasonBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+  }
+  function startLiveTimer() {
+    const startStr = document.getElementById('jobStart').value;
+    const extra = parseInt(document.getElementById('totalWork').value);
+    const status = document.getElementById('jobStatus').value;
+    const timerSpan = document.getElementById('liveTimer');
+    const nowSpan = document.getElementById('currentTime');
+    if (!startStr || status === 'Paused') return;
+    const startTime = new Date(startStr);
+    setInterval(() => {
+      const now = new Date();
+      nowSpan.innerText = now.toLocaleTimeString();
+      const diff = Math.floor((now - startTime) / 1000) + extra;
+      timerSpan.innerText = formatTime(diff);
+    }, 1000);
+  }
+  startLiveTimer();
+</script>
+{% endblock %}

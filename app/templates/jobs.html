@@ -1,13 +1,10 @@
 {% extends "layout.html" %}
 {% block title %}Jobs{% endblock %}
-
 {% block content %}
 <h2>Job List</h2>
-
 {% if current_user.role == 'admin' %}
 <a href="{{ url_for('main.add_job') }}">Add New Job</a>
 {% endif %}
-
 <ul>
   {% for job in jobs %}
   <li>
@@ -18,9 +15,7 @@
     Start: {{ job.start_date }} |
     End: {{ job.end_date }} |
     Cost: ${{ job.total_cost }}
-
-    {% if current_user.role == 'admin' %}
-    <br>
+    {% if current_user.role == 'admin' %}<br>
     <a href="{{ url_for('main.edit_job', job_id=job.id) }}">Edit</a>
     |
     <form action="{{ url_for('main.delete_job', job_id=job.id) }}" method="POST" style="display:inline;">

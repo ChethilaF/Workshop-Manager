@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2>Admin Dashboard</h2>
+<p>Welcome, {{ current_user.username }}!</p>
+<ul>
+    <li><a href="#">Manage Jobs</a></li>
+    <li><a href="#">View Reports</a></li>
+    <li><a href="#">Add Users</a></li>
+</ul>
+{% endblock %}

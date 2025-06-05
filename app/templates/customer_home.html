@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Vehicle Status Lookup{% endblock %}
+{% block content %}
+<h2>Vehicle Status Lookup</h2>
+<form method="POST">
+  <input type="text" name="reg_number" placeholder="Enter vehicle registration" required>
+  <input type="submit" value="Check Status">
+</form>
+{% if status %}
+<h3>Status:</h3>
+<p>Description: {{ status.description }}</p>
+<p>Status: {{ status.status }}</p>
+<p>Start: {{ status.start_date }} — End: {{ status.end_date }}</p>
+<p>Technician: {{ status.technician }}</p>
+{% endif %}
+{% endblock %}

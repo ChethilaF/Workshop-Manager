@@ -1,0 +1,32 @@
+% extends "layout.html" %}
+{% block title %}Jobs for {{ technician.name }}{% endblock %}
+{% block content %}
+<h2>Jobs Assigned to {{ technician.name }}</h2>
+{% if jobs %}
+<ul>
+    {% for job in jobs %}
+    <li>
+        <strong>{{ job.description }}</strong><br>
+        Status: {{ job.status }}<br>
+        Start: {{ job.start_date }} |
+        End: {{ job.end_date }} |
+        Cost: ${{ job.total_cost }}<br>
+        Customer: {{ job.customer.name }}
+    </li>
+    <div class="job-card">
+        <h3>{{ job.description }}</h3>
+        <p>Status: {{ job.status }}</p>
+        {% if not job.accepted %}
+        <form action="{{ url_for('main.accept_job', job_id=job.id) }}" method="POST">
+            <button type="submit">Accept Job</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('main.job_control', job_id=job.id) }}">
+            <button>Go to Job Control</button>
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</ul>
+{% else %}<p>No jobs assigned yet.</p>{% endif %}
+{% endblock %}

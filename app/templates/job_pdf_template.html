@@ -1,0 +1,48 @@
+html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Job Summary</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+
+    p,
+    li {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Job Summary Report</h1>
+  <p><strong>Technician:</strong> {{ technician.name }}</p>
+  <p><strong>Vehicle Registration:</strong> {{ job.vehicle_registration }}</p>
+  <p><strong>Description:</strong> {{ job.description }}</p>
+  <p><strong>Status:</strong> {{ job.status }}</p>
+  <p><strong>Start Time:</strong> {{ job.start_time.strftime('%Y-%m-%d %H:%M:%S') if job.start_time else 'N/A' }}</p>
+  <p><strong>End Time:</strong> {{ job.end_time.strftime('%Y-%m-%d %H:%M:%S') if job.end_time else 'N/A' }}</p>
+  <p><strong>Total Time Worked:</strong> {{ duration }}</p>
+  {% if pauses %}
+  <h2>Pause History</h2>
+  <ul>
+    {% for pause in pauses %}
+    <li>
+      <strong>Paused at:</strong> {{ pause.paused_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
+      {% if pause.resumed_at %}<strong>Resumed at:</strong> {{ pause.resumed_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
+      {% else %}<strong>Resumed at:</strong> (not resumed)<br>{% endif %}
+      <strong>Reason:</strong> {{ pause.reason or 'N/A' }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</body>
+
+</html>

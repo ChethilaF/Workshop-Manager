@@ -1,20 +1,15 @@
 {% extends "layout.html" %}
 {% block title %}Customers{% endblock %}
-
 {% block content %}
 <h2>Customer List</h2>
-
 {% if current_user.role == 'admin' %}
 <a href="{{ url_for('main.add_customer') }}">Add New Customer</a>
 {% endif %}
-
 <ul>
   {% for customer in customers %}
   <li>
-    {{ customer.name }} — {{ customer.email }} — {{ customer.phone }} — {{ customer.address }}
-
+    {{ customer.name }} — {{ customer.email }} — {{ customer.phone }} — {{ customer.address }}<br>
     {% if current_user.role == 'admin' %}
-    <br>
     <a href="{{ url_for('main.edit_customer', customer_id=customer.id) }}">Edit</a>
     |
     <form action="{{ url_for('main.delete_customer', customer_id=customer.id) }}" method="POST" style="display:inline;">
