@@ -10,25 +10,14 @@
 <body>
     <div class="sidebar" id="sidebar">
         <div class="logo">🔧 Workshop Manager</div>
-        <ul>
-            {% if current_user.is_authenticated %}
-            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-            {% if current_user.role == 'admin' %}
+        <ul> {% if current_user.is_authenticated %} <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
             <li><a href="{{ url_for('main.customers') }}">Customers</a></li>
             <li><a href="{{ url_for('main.technicians') }}">Technicians</a></li>
             <li><a href="{{ url_for('main.jobs') }}">Jobs</a></li>
-            <li><a href="{{ url_for('main.staff_dashboard') }}">Staff</a></li>
-            {% elif current_user.role == 'technician' %}
-            <li><a href="{{ url_for('main.technician_dashboard') }}">My Jobs</a></li>
-            {% elif current_user.role == 'finance' %}
-            <li><a href="#">Finance Panel</a></li>
-            {% elif current_user.role == 'manager' %}
-            <li><a href="#">Manager View</a></li>
-            {% endif %}        
-            <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
-            {% else %}
-            <li><a href="{{ url_for('main.login') }}">Login</a></li>
-            {% endif %}
+            <li><a href="{{ url_for('main.staff') }}">Staff</a></li> {% if current_user.role == 'technician' %}
+            <li><a href="{{ url_for('main.technician_jobs') }}">Technician Dashboard</a></li> {% endif %}
+            <li><a href="{{ url_for('main.logout') }}">Logout</a></li> {% else %}
+            <li><a href="{{ url_for('main.login') }}">Login</a></li> {% endif %}
         </ul>
     </div>
 
@@ -36,11 +25,11 @@
         <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <ul class="flashes">
+        <div class="alerts">
             {% for category, message in messages %}
-            <li class="flash {{ category }}">{{ message }}</li>
+            <div class="alert {{ category }}">{{ message }}</div>
             {% endfor %}
-        </ul>
+        </div>
         {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}

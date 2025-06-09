@@ -174,3 +174,75 @@ input[type="password"] {
         display: none;
     }
 }
+
+.alerts {
+    margin: 1rem 0;
+}
+
+.alert {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+.status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status.in-progress {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.status.completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+.status {
+padding: 2px 8px;
+border-radius: 12px;
+font-size: 12px;
+color: white;
+font-weight: bold;
+}
+
+.status.pending {
+background-color: #f0ad4e;
+}
+
+.status.in-progress {
+background-color: #5bc0de;
+}
+
+.status.completed {
+background-color: #5cb85c;
+}
+
+.status.cancelled {
+background-color: #d9534f;
+}

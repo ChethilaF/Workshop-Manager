@@ -82,7 +82,6 @@ def customer_dashboard():
         return render_template('customer_dashboard.html', status=job)
     return render_template('customer_dashboard.html')
 
-# Customers
 @main.route('/customers')
 @login_required
 def customers():
@@ -125,7 +124,6 @@ def delete_customer(customer_id):
     db.session.commit()
     return redirect(url_for('main.customers'))
 
-# Technicians
 @main.route('/technicians')
 @login_required
 def technicians():
@@ -168,7 +166,6 @@ def delete_technician(technician_id):
     db.session.commit()
     return redirect(url_for('main.technicians'))
 
-# Jobs
 @main.route('/jobs')
 @login_required
 def jobs():

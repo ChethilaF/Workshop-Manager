@@ -11,7 +11,7 @@
     <strong>{{ job.description }}</strong><br>
     Customer: {{ job.customer.name }} |
     Technician: {{ job.technician.name }}<br>
-    Status: {{ job.status }} |
+    Status: <span class="status {{ job.status|lower|replace(' ', '-') }}"> {{ job.status }} </span> |
     Start: {{ job.start_date }} |
     End: {{ job.end_date }} |
     Cost: ${{ job.total_cost }}
