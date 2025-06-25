@@ -1,0 +1,104 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: top;
+    min-height: 80vh;
+    color: #000000;
+    background-color: #104e8b;
+    border-radius: 40px;
+    text-align: center;
+    padding: 20px;
+    z-index: 1002;
+}
+
+.home-logo {
+    width: 70%;
+    margin-bottom: 50px;
+}
+
+.home-heading {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.home-subtext {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.login-form {
+    background-color: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 10px;
+    width: 280px;
+    text-align: center;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 460px;
+    margin: 10px auto;
+    padding: 20px;
+
+    height: 200px;
+    background:#cdeaff;
+    border-radius: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+.login-form label {
+    display: block;
+    margin: 110px 0 5px;
+    color: #007BFF;
+}
+
+.login-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #000000;
+}
+
+.username-feild {
+    
+
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #000000;
+}
+
+.password-feild {
+    margin-top: 20px;
+    height: 20px;
+    width: 100px;
+    font-size: 1.2rem;
+    color: #000000;
+}
+
+.login-button {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #000000;
+}
+
+
+.register-link {
+    margin-top: 25px;
+    margin-bottom: 0px;
+    font-size: 1.2rem;
+}
+
+.register-link a {
+    color: #ff6767;
+    text-decoration: none;
+}

@@ -10,7 +10,7 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', hide_sidebar=True)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -20,7 +20,7 @@ def login():
             login_user(user)
             return redirect(url_for('main.dashboard'))
         flash('Invalid credentials', 'danger')
-    return render_template('login.html', role='user')
+    return render_template('login.html', hide_sidebar=True)
 
 @main.route('/logout')
 @login_required
