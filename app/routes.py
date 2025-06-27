@@ -8,12 +8,19 @@ from app.utils.pdf_generator import generate_job_pdf
 
 main = Blueprint('main', __name__)
 
-@main.route('/')
+@main.route("/", methods=["GET", "POST"])
 def home():
-    return render_template('home.html', hide_sidebar=True)
+    if request.method == "POST":
+        user = User.query.filter_by(username=request.form["username"]).first()
+        if user and check_password_hash(user.password_hash, request.form["password"]):
+            login_user(user)
+            return redirect(url_for("main.dashboard"))
+        flash("Invalid credentials", "danger")
+    return render_template("home.html", hide_sidebar=True)
 
-@main.route('/login', methods=['GET', 'POST'])
-def login():
+
+# @main.route('/login', methods=['GET', 'POST'])
+# def login():
     if request.method == 'POST':
         user = User.query.filter_by(username=request.form['username']).first()
         if user and check_password_hash(user.password_hash, request.form['password']):
@@ -50,7 +57,7 @@ def register():
 
         db.session.commit()
         flash('Registration successful. You can now log in.')
-        return redirect(url_for('main.login'))
+        return redirect(url_for('main.home'))
     return render_template('register.html')
 
 @main.route('/dashboard')

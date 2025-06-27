@@ -1,104 +1,145 @@
+/* Fullscreen blue background */
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  height: 100%;
+  background-color: #104e8b;
+  overflow: hidden;
+}
+
+/* Page wrapper */
 .home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: top;
-    min-height: 80vh;
-    color: #000000;
-    background-color: #104e8b;
-    border-radius: 40px;
-    text-align: center;
-    padding: 20px;
-    z-index: 1002;
+display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background-color: #104e8b;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
+/* Logo styling */
 .home-logo {
-    width: 70%;
-    margin-bottom: 50px;
+  width: 380px;
+  margin-bottom: 20px;
+  margin-top: 0px;
 }
 
+/* Headings */
 .home-heading {
-    font-size: 2rem;
-    margin-bottom: 10px;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  color: #000000;
+    
 }
 
 .home-subtext {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
 }
 
 .login-form {
-    background-color: rgb(0, 0, 0);
-    padding: 20px;
-    border-radius: 10px;
-    width: 280px;
-    text-align: center;
-    z-index: 1100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(107, 107, 107);
+  width: 450px;
+  height: 250px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  border-radius: 40px;
 }
 
-.login-container {
-    width: 460px;
-    margin: 10px auto;
-    padding: 20px;
-
-    height: 200px;
-    background:#cdeaff;
-    border-radius: 40px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+.login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
-.login-form label {
-    display: block;
-    margin: 110px 0 5px;
-    color: #007BFF;
+.login-form input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  width: 100%;
 }
 
-.login-form input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    border: 1px solid #000000;
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  padding: 14px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 40px;
+  font-size: 16px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.288);
 }
 
-.username-feild {
-    
-
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    color: #000000;
+.login-form input:focus {
+  transform: scale(1.2);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.password-feild {
-    margin-top: 20px;
-    height: 20px;
-    width: 100px;
-    font-size: 1.2rem;
-    color: #000000;
+.login-form button {
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.login-button {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    color: #000000;
+.login-form button:hover {
+  background-color: #002244;
+  transform: scale(1.2);
+  transition: all 0.3s ease-in-out;
 }
 
-
+/* Register link */
 .register-link {
-    margin-top: 25px;
-    margin-bottom: 0px;
-    font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  background-color: rgba(111, 111, 111, 0.904);
+  padding: 10px;
+  margin-top: 0px;
+  font-size: 1rem;
+  color: white;
 }
 
 .register-link a {
-    color: #ff6767;
-    text-decoration: none;
+  color: #000000;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration:none;
+  color: #ffffff; 
+  transition: all 0.3s ease-in-out;
 }

@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-
 {% block title %}Welcome | Workshop Manager{% endblock %}
 
 {% block extra_css %}
@@ -8,29 +7,25 @@
 
 {% block content %}
 <div class="home-container">
-  <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="home-logo">
-
+  
+  <img src="{{ url_for('static', filename='logo.png') }}" alt="Workshop Manager Logo" class="home-logo">
   <h1 class="home-heading">Welcome</h1>
 
-  <div class="login-container">
-          
-    {% if not current_user.is_authenticated %}
-    <form method="POST" action="{{ url_for('main.login') }}">
-  
-      <input type="text", name="username", id="username", class="username-feild" placeholder="Username" required>
-  
-      <input type="password", name="password", id="password", class="password-feild" placeholder="Password" required>
-  
-      {% if error %}
-      <div class="error-message">{{ error }}</div>
-      {% endif %}
-  
-      <input type="submit" value="Lets go!", class="login-button">
-    </form>
+
+  <form method="POST" class="login-form">
+  <div class="form-group">
+    <input type="text" name="username" id="username" , placeholder="Username" required>
   </div>
+
+  <div class="form-group">
+    <input type="password" name="password" id="password" placeholder="Password" required>
+  </div>
+
+  <button type="submit">Sign In</button>
+</form>
   <p class="register-link">
     Don’t have an account? <a href="{{ url_for('main.register') }}">Register here</a>
   </p>
 </div>
-{%endif%}
 {% endblock %}
+

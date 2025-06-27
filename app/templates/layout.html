@@ -2,67 +2,52 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}Workshop Manager{% endblock %}</title>
-
-    <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        {% block extra_css %}{% endblock %}
-    </head>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Workshop Manager{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-
-  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-
-  <div class="wrapper">
-
-    {% if not hide_sidebar %}
-    <div class="sidebar" id="sidebar">
-      <div class="header-logo">
-        <img src="{{ url_for('static', filename='logo-2-Copy.png') }}" alt="Mozita" />
-      </div>
-      <ul>
-        {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-          <li><a href="{{ url_for('main.customers') }}">Customers</a></li>
-          <li><a href="{{ url_for('main.technicians') }}">Technicians</a></li>
-          <li><a href="{{ url_for('main.jobs') }}">Jobs</a></li>
-          <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
-        {% else %}
-          <li><a href="{{ url_for('main.login') }}">Login</a></li>
-        {% endif %}
-      </ul>
-    </div>
-    {% endif %}
-
-    <div class="main-content" id="main-content">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          <div class="alerts">
-            {% for category, message in messages %}
-              <div class="alert {{ category }}">{{ message }}</div>
-            {% endfor %}
+  {% if not hide_navbar %}
+    <!-- Top nav bar -->
+    <header class="top-nav">
+      <div class="nav-left">
+        {% if not hide_sidebar %}
+          <div class="header-logo">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Mozita" />
           </div>
         {% endif %}
-      {% endwith %}
+      </div>
+      <nav class="nav-right">
+        <ul>
+          {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('main.customers') }}">Customers</a></li>
+            <li><a href="{{ url_for('main.technicians') }}">Technicians</a></li>
+            <li><a href="{{ url_for('main.jobs') }}">Jobs</a></li>
+            <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </header>
+  {% endif %}
 
-      {% block content %}{% endblock %}
-    </div>
+  <!-- Main content -->
+  <main class="main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alerts">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-  </div>
-
-  <script>
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        sidebar.classList.toggle('active');
-      }
-    }
-  </script>
+    {% block content %}{% endblock %}
+  </main>
 </body>
-
 
 </html>
