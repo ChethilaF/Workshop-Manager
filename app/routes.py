@@ -16,7 +16,7 @@ def home():
             login_user(user)
             return redirect(url_for("main.dashboard"))
         flash("Invalid credentials", "danger")
-    return render_template("home.html", hide_sidebar=True)
+    return render_template("home.html", hide_navbar=True)
 
 
 # @main.route('/login', methods=['GET', 'POST'])
@@ -58,7 +58,8 @@ def register():
         db.session.commit()
         flash('Registration successful. You can now log in.')
         return redirect(url_for('main.home'))
-    return render_template('register.html')
+    return render_template('register.html', hide_sidebar=True)
+
 
 @main.route('/dashboard')
 @login_required
