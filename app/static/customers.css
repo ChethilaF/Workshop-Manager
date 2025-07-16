@@ -1,0 +1,107 @@
+body {
+  background-color: #3B5998;
+  font-family: 'Raleway', sans-serif;
+  margin: 0;
+  padding: 0;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.customers-container {
+  margin-top: 40px;
+  padding: 30px 40px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  max-width: 700px;
+  width: 100%;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.action-bar {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.btn-add {
+  background-color: #1e90ff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.btn-add:hover {
+  background-color: #0b6fcc;
+}
+
+.customer-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.customer-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.customer-info span {
+  font-size: 18px;
+}
+
+.customer-info small {
+  font-size: 14px;
+  color: #ccc;
+}
+
+.customer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-edit,
+.btn-delete {
+  background-color: #444;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-edit i,
+.btn-delete i {
+  margin-right: 5px;
+}
+
+.btn-edit:hover {
+  background-color: #3a8eed;
+}
+
+.btn-delete:hover {
+  background-color: #d9534f;
+}
+
+.delete-form {
+  display: inline;
+}

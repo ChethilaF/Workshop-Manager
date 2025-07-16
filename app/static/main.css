@@ -4,11 +4,22 @@ body {
   color: white;
 }
 
+.page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  min-height: calc(100vh - 100px);
+  box-sizing: border-box;
+}
+
 .top-bar-wrapper {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   margin: 10px 5px 0  5px;
+  background-color: #3B5998;
+  padding: 10px 20px;
 }
 
 .top-nav {
@@ -127,6 +138,8 @@ body {
   background-color:#3B5998;
   transition: margin-left 0.3s ease;
   font-family: Raleway, sans-serif;
+  width: 100%;
+  max-width: 800px;
 }
 
 .main-content.shifted {

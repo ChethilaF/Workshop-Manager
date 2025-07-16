@@ -27,11 +27,17 @@ class User(db.Model, UserMixin):
 class Customer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), default='Not Provided')
+    phone = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.String(200), default='Not Provided')
+
 
 class Technician(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    phone = db.Column(db.String(20))
+    specialization = db.Column(db.String(100))
+    user_id = db.Column(db.Integer, unique=True, nullable=False)
 
 class Job(db.Model):
     tablename = 'job'

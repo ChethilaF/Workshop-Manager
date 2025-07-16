@@ -1,14 +1,35 @@
 {% extends "layout.html" %}
 {% block title %}Add Customer{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='add_customer.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Add New Customer</h2>
-<form method="POST">
-    <input type="text" name="name" placeholder="Full name" required><br><br>
-    <input type="email" name="email" placeholder="Email"><br><br>
-    <input type="text" name="phone" placeholder="Phone"><br><br>
-    <input type="text" name="address" placeholder="Address"><br><br>
-    <input type="submit" value="Add Customer">
-</form>
-<br>
-<a href="{{ url_for('main.customers') }}">← Back to Customers</a>
+<div class="customer-form-container">
+  <h2>Add New Customer</h2>
+  <form method="POST">
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="name" placeholder="Full name" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input type="text" name="phone" placeholder="Phone" required pattern="^[0-9\-\+]{7,15}$" title="Enter a valid phone number">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" name="email" placeholder="Email (optional)">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-map-marker-alt"></i>
+      <input type="text" name="address" placeholder="Address (optional)">
+    </div>
+    <button type="submit" class="btn-submit">Add Customer</button>
+  </form>
+  <div class="back-link">
+    <a href="{{ url_for('main.customers') }}">&larr; Back to Customers</a>
+  </div>
+</div>
 {% endblock %}

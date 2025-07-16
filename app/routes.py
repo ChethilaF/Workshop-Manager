@@ -38,27 +38,34 @@ def logout():
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        user = User(
-            username=request.form['username'],
-            password_hash=generate_password_hash(request.form['password']),
-            role=request.form['role']
-        )
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = request.form.get('role')
+        name = request.form.get('name')
+        email = request.form.get('email') or 'Not Provided'
+        phone = request.form.get('phone') or 'Not Provided'
+
+        if not username or not password or not role:
+            flash("Username, password, and role are required.", "danger")
+            return redirect(url_for('main.register'))
+
+        # Check if username already exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash("Username already taken.", "danger")
+            return redirect(url_for('main.register'))
+
+        user = User(username=username, role=role)
+        user.set_password(password)
+
         db.session.add(user)
         db.session.commit()
 
-        if user.role == 'technician':
-            tech = Technician(
-                name=request.form['name'],
-                email=request.form['email'],
-                phone=request.form['phone'],
-                user_id=user.id
-            )
-            db.session.add(tech)
-
-        db.session.commit()
-        flash('Registration successful. You can now log in.')
+        flash("Registration successful. Please log in.", "success")
         return redirect(url_for('main.home'))
+
     return render_template('register.html', hide_sidebar=True)
+
 
 
 @main.route('/dashboard')
@@ -100,15 +107,27 @@ def customers():
 @login_required
 def add_customer():
     if request.method == 'POST':
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        email = request.form.get('email') or 'Not Provided'
+        address = request.form.get('address') or 'Not Provided'
+
+        if not name or not phone:
+            flash("Name and phone are required.", "danger")
+            return redirect(url_for('main.add_customer'))
+
         customer = Customer(
-            name=request.form['name'],
-            email=request.form['email'],
-            phone=request.form['phone'],
-            address=request.form['address']
+            name=name,
+            phone=phone,
+            email=email,
+            address=address
         )
+
         db.session.add(customer)
         db.session.commit()
+        flash("Customer added successfully.", "success")
         return redirect(url_for('main.customers'))
+
     return render_template('add_customer.html')
 
 @main.route('/edit_customer/<int:customer_id>', methods=['GET', 'POST'])
@@ -142,15 +161,32 @@ def technicians():
 @login_required
 def add_technician():
     if request.method == 'POST':
-        tech = Technician(
-            name=request.form['name'],
-            email=request.form['email'],
-            phone=request.form['phone'],
-            specialization=request.form['specialization']
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        specialization = request.form.get('specialization')
+        user_id_str = request.form.get('user_id')
+
+        if not name or not user_id_str or not user_id_str.isdigit():
+            flash("Name and numeric User ID are required.", "danger")
+            return redirect(url_for('main.add_technician'))
+
+        user_id = int(user_id_str)
+
+        if Technician.query.filter_by(user_id=user_id).first():
+            flash(f"A technician with User ID {user_id} already exists.", "danger")
+            return redirect(url_for('main.add_technician'))
+
+        technician = Technician(
+            name=name,
+            phone=phone,
+            specialization=specialization,
+            user_id=user_id
         )
-        db.session.add(tech)
+        db.session.add(technician)
         db.session.commit()
+        flash("Technician added successfully.", "success")
         return redirect(url_for('main.technicians'))
+
     return render_template('add_technician.html')
 
 @main.route('/edit_technician/<int:technician_id>', methods=['GET', 'POST'])

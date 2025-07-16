@@ -1,14 +1,35 @@
 {% extends "layout.html" %}
 {% block title %}Add Technician{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='add_technician.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Add New Technician</h2>
-<form method="POST">
-    <input type="text" name="name" placeholder="Full name" required><br><br>
-    <input type="email" name="email" placeholder="Email"><br><br>
-    <input type="text" name="phone" placeholder="Phone"><br><br>
-    <input type="text" name="specialization" placeholder="Specialization"><br><br>
-    <input type="submit" value="Add Technician">
-</form>
-<br>
-<a href="{{ url_for('main.technicians') }}">← Back to Technicians</a>
+<div class="technician-form-container">
+  <h2>Add New Technician</h2>
+  <form method="POST">
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="name" placeholder="Full name" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input type="text" name="phone" placeholder="Phone">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-tools"></i>
+      <input type="text" name="specialization" placeholder="Specialization">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-id-badge"></i>
+      <input type="number" name="user_id" placeholder="Custom User ID" required>
+    </div>
+    <button type="submit" class="btn-submit">Add Technician</button>
+  </form>
+  <div class="back-link">
+    <a href="{{ url_for('main.technicians') }}">&larr; Back to Technicians</a>
+  </div>
+</div>
 {% endblock %}

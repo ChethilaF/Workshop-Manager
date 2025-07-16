@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Workshop Manager{% endblock %}</title>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
@@ -37,12 +36,12 @@
           <p><strong>Role:</strong> {{ current_user.role }}</p>
         </div>
       </div>
-      {% else %}
       {% endif %}
     </header>
   </div>
-    {% endif %}
+  {% endif %}
 
+  <div class="page-wrapper">
     <main class="main-content">
       {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -56,21 +55,22 @@
 
       {% block content %}{% endblock %}
     </main>
-    <script>
-      function toggleUserPopup() {
-        const popup = document.getElementById('user-popup');
-        popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+  </div>
+
+  <script>
+    function toggleUserPopup() {
+      const popup = document.getElementById('user-popup');
+      popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.addEventListener('click', function (e) {
+      const profile = document.querySelector('.user-profile');
+      const popup = document.getElementById('user-popup');
+      if (!profile.contains(e.target)) {
+        popup.style.display = 'none';
       }
-
-      document.addEventListener('click', function (e) {
-        const profile = document.querySelector('.user-profile');
-        const popup = document.getElementById('user-popup');
-        if (!profile.contains(e.target)) {
-          popup.style.display = 'none';
-        }
-      });
-    </script>
-
+    });
+  </script>
 </body>
 
 </html>
