@@ -1,10 +1,7 @@
 from app import db
 from flask_login import UserMixin
 from app import login_manager
-from app import db, login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -30,7 +27,7 @@ class Customer(db.Model):
     email = db.Column(db.String(120), default='Not Provided')
     phone = db.Column(db.String(20), nullable=False)
     address = db.Column(db.String(200), default='Not Provided')
-
+    jobs = db.relationship('Job', back_populates='customer', cascade="all, delete-orphan")
 
 class Technician(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,9 +35,10 @@ class Technician(db.Model):
     phone = db.Column(db.String(20))
     specialization = db.Column(db.String(100))
     user_id = db.Column(db.Integer, unique=True, nullable=False)
+    jobs = db.relationship('Job', back_populates='technician', cascade="all, delete-orphan")
 
 class Job(db.Model):
-    tablename = 'job'
+    __tablename__ = 'job'
     id = db.Column(db.Integer, primary_key=True)
     vehicle_registration = db.Column(db.String(20))
     description = db.Column(db.Text, nullable=False)
@@ -57,6 +55,8 @@ class Job(db.Model):
     paused_at = db.Column(db.DateTime)
     resume_at = db.Column(db.DateTime)
     accepted = db.Column(db.Boolean, default=False)
+    customer = db.relationship('Customer', back_populates='jobs')
+    technician = db.relationship('Technician', back_populates='jobs')
 
 class PauseLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -64,6 +64,15 @@ class PauseLog(db.Model):
     paused_at = db.Column(db.DateTime, nullable=False)
     resumed_at = db.Column(db.DateTime)
     reason = db.Column(db.Text)
+
+class ShiftLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'))
+    date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time)
+    end_time = db.Column(db.Time)
+
+    technician = db.relationship('Technician', backref='shifts')
 
 @login_manager.user_loader
 def load_user(user_id):

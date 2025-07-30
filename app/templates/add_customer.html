@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="customer-form-container">
+<div class="form-container">
   <h2>Add New Customer</h2>
   <form method="POST">
     <div class="input-group">
@@ -27,9 +27,9 @@
       <input type="text" name="address" placeholder="Address (optional)">
     </div>
     <button type="submit" class="btn-submit">Add Customer</button>
+    <div class="back-link">
+      <a href="{{ url_for('main.customers') }}">Back to Customers</a>
+    </div>
   </form>
-  <div class="back-link">
-    <a href="{{ url_for('main.customers') }}">&larr; Back to Customers</a>
-  </div>
 </div>
 {% endblock %}

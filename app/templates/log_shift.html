@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Log Shift{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='log_shift.css') }}">
+{% endblock %}
+{% block content %}
+<div class="log-shift-container">
+  <h2>Time Logging for {{ technician.name }}</h2>
+  <form method="POST">
+    {% if not shift %}
+      <div class="form-section">
+        <label>Start Time:</label>
+        <input type="time" name="start_time" required>
+        <button type="submit">Start Work</button>
+      </div>
+    {% elif not shift.end_time %}
+      <div class="form-section">
+        <p>Start Time: {{ shift.start_time.strftime('%H:%M') }}</p>
+        <label>End Time:</label>
+        <input type="time" name="end_time" required>
+        <button type="submit">End Work</button>
+      </div>
+    {% else %}
+      <p>Shift complete for today.</p>
+      <p>Start: {{ shift.start_time.strftime('%H:%M') }}, End: {{ shift.end_time.strftime('%H:%M') }}</p>
+    {% endif %}
+  </form>
+  <a class="back-link" href="{{ url_for('main.staff_dashboard') }}">&larr; Back to Dashboard</a>
+</div>
+{% endblock %}

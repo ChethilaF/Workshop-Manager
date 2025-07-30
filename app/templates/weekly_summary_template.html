@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Weekly Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weekly Technician Summary</h1>
+    <p><strong>Technician:</strong> {{ technician.name }}</p>
+    <p><strong>Week:</strong> {{ start_of_week }} - {{ end_of_week }}</p>
+
+    <h2>Shift Logs</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+        {% for log in shift_logs %}
+        <tr>
+            <td>{{ log.date }}</td>
+            <td>{{ log.start_time.strftime('%H:%M') if log.start_time else 'N/A' }}</td>
+            <td>{{ log.end_time.strftime('%H:%M') if log.end_time else 'N/A' }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Completed Jobs</h2>
+    <table>
+        <tr>
+            <th>Job ID</th>
+            <th>Description</th>
+            <th>Vehicle Reg</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+        </tr>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.id }}</td>
+            <td>{{ job.description }}</td>
+            <td>{{ job.vehicle_registration }}</td>
+            <td>{{ job.start_date }}</td>
+            <td>{{ job.end_date }}</td>
+            <td>{{ job.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

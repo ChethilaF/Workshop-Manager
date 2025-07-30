@@ -1,20 +1,41 @@
 {% extends "layout.html" %}
 {% block title %}Technicians{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='technicians.css') }}">
+{% endblock %}
+
 {% block content %}
 <h2>Technician List</h2>
+
 {% if current_user.role == 'admin' %}
-<a href="{{ url_for('main.add_technician') }}">Add New Technician</a>
+<div class="action-bar">
+  <a class="btn-add" href="{{ url_for('main.add_technician') }}">
+    <i class="fas fa-user-plus"></i> Add New Technician
+  </a>
+</div>
 {% endif %}
-<ul>
+
+<ul class="technician-list">
   {% for tech in technicians %}
-  <li>
-    {{ tech.name }} — {{ tech.email }} — {{ tech.phone }} — {{ tech.specialization }}
-    {% if current_user.role == 'admin' %}<br>
-    <a href="{{ url_for('main.edit_technician', technician_id=tech.id) }}">Edit</a>
-    |
-    <form action="{{ url_for('main.delete_technician', technician_id=tech.id) }}" method="POST" style="display:inline;">
-      <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
-    </form>
+  <li class="technician-item">
+    <div class="technician-info">
+      <span><strong>{{ tech.name }}</strong></span><br>
+      <small>{{ tech.email }} | {{ tech.phone }} | {{ tech.specialization }}</small>
+    </div>
+
+    {% if current_user.role == 'admin' %}
+    <div class="technician-actions">
+      <a href="{{ url_for('main.edit_technician', technician_id=tech.id) }}" class="btn-edit">
+        <i class="fas fa-edit"></i> Edit
+      </a>
+      <form action="{{ url_for('main.delete_technician', technician_id=tech.id) }}" method="POST" class="delete-form">
+        <button type="submit" onclick="return confirm('Are you sure?')" class="btn-delete">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </form>
+    </div>
     {% endif %}
   </li>
   {% endfor %}

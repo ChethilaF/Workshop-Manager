@@ -18,55 +18,15 @@ def home():
         flash("Invalid credentials", "danger")
     return render_template("home.html", hide_navbar=True)
 
-
-# @main.route('/login', methods=['GET', 'POST'])
-# def login():
-    if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and check_password_hash(user.password_hash, request.form['password']):
-            login_user(user)
-            return redirect(url_for('main.dashboard'))
-        flash('Invalid credentials', 'danger')
-    return render_template('login.html', hide_sidebar=True)
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    return home()
 
 @main.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
-
-@main.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        role = request.form.get('role')
-        name = request.form.get('name')
-        email = request.form.get('email') or 'Not Provided'
-        phone = request.form.get('phone') or 'Not Provided'
-
-        if not username or not password or not role:
-            flash("Username, password, and role are required.", "danger")
-            return redirect(url_for('main.register'))
-
-        # Check if username already exists
-        existing_user = User.query.filter_by(username=username).first()
-        if existing_user:
-            flash("Username already taken.", "danger")
-            return redirect(url_for('main.register'))
-
-        user = User(username=username, role=role)
-        user.set_password(password)
-
-        db.session.add(user)
-        db.session.commit()
-
-        flash("Registration successful. Please log in.", "success")
-        return redirect(url_for('main.home'))
-
-    return render_template('register.html', hide_sidebar=True)
-
-
 
 @main.route('/dashboard')
 @login_required
@@ -77,25 +37,6 @@ def dashboard():
 @login_required
 def admin_dashboard():
     return render_template('admin_dashboard.html')
-
-@main.route('/technician_dashboard')
-@login_required
-def technician_dashboard():
-    if current_user.role != 'technician':
-        flash('Unauthorized')
-        return redirect(url_for('main.dashboard'))
-    tech = Technician.query.filter_by(user_id=current_user.id).first()
-    jobs = Job.query.filter_by(technician_id=tech.id).all()
-    return render_template('technician_dashboard.html', jobs=jobs)
-
-@main.route('/customer_dashboard', methods=['GET', 'POST'])
-@login_required
-def customer_dashboard():
-    if request.method == 'POST':
-        reg = request.form['rego']
-        job = Job.query.filter_by(vehicle_registration=reg).first()
-        return render_template('customer_dashboard.html', status=job)
-    return render_template('customer_dashboard.html')
 
 @main.route('/customers')
 @login_required
@@ -161,30 +102,36 @@ def technicians():
 @login_required
 def add_technician():
     if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
         name = request.form.get('name')
         phone = request.form.get('phone')
         specialization = request.form.get('specialization')
-        user_id_str = request.form.get('user_id')
+        role = request.form.get('role')
 
-        if not name or not user_id_str or not user_id_str.isdigit():
-            flash("Name and numeric User ID are required.", "danger")
+        if not username or not password or not name:
+            flash("Username, password, and name are required.", "danger")
             return redirect(url_for('main.add_technician'))
 
-        user_id = int(user_id_str)
-
-        if Technician.query.filter_by(user_id=user_id).first():
-            flash(f"A technician with User ID {user_id} already exists.", "danger")
+        if User.query.filter_by(username=username).first():
+            flash("Username already exists.", "danger")
             return redirect(url_for('main.add_technician'))
+
+        user = User(username=username, role=role)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
 
         technician = Technician(
             name=name,
             phone=phone,
             specialization=specialization,
-            user_id=user_id
+            user_id=user.id
         )
         db.session.add(technician)
         db.session.commit()
-        flash("Technician added successfully.", "success")
+
+        flash("Technician account created successfully.", "success")
         return redirect(url_for('main.technicians'))
 
     return render_template('add_technician.html')
@@ -221,20 +168,30 @@ def jobs():
 def add_job():
     customers = Customer.query.all()
     technicians = Technician.query.all()
+
     if request.method == 'POST':
-        job = Job(
-            description=request.form['description'],
-            start_date=request.form['start_date'],
-            end_date=request.form['end_date'],
-            status=request.form['status'],
-            total_cost=request.form['total_cost'],
-            customer_id=request.form['customer_id'],
-            technician_id=request.form['technician_id'],
-            vehicle_registration=request.form['vehicle_registration']
-        )
-        db.session.add(job)
-        db.session.commit()
-        return redirect(url_for('main.jobs'))
+        try:
+            start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
+
+            job = Job(
+                description=request.form['description'],
+                start_date=start_date,
+                end_date=end_date,
+                status=request.form['status'],
+                total_cost=request.form['total_cost'],
+                customer_id=request.form['customer_id'],
+                technician_id=request.form['technician_id'],
+                vehicle_registration=request.form['vehicle_registration']
+            )
+
+            db.session.add(job)
+            db.session.commit()
+            return redirect(url_for('main.jobs'))
+
+        except ValueError:
+            flash("Invalid date format. Please use YYYY-MM-DD.", "danger")
+
     return render_template('add_job.html', customers=customers, technicians=technicians)
 
 @main.route('/edit_job/<int:job_id>', methods=['GET', 'POST'])
@@ -243,17 +200,20 @@ def edit_job(job_id):
     job = Job.query.get_or_404(job_id)
     customers = Customer.query.all()
     technicians = Technician.query.all()
+
     if request.method == 'POST':
         job.description = request.form['description']
-        job.start_date = request.form['start_date']
-        job.end_date = request.form['end_date']
+        job.start_date = datetime.strptime(request.form['start_date'], '%Y-%m-%d').date()
+        job.end_date = datetime.strptime(request.form['end_date'], '%Y-%m-%d').date()
         job.status = request.form['status']
-        job.total_cost = request.form['total_cost']
-        job.customer_id = request.form['customer_id']
-        job.technician_id = request.form['technician_id']
+        job.total_cost = float(request.form['total_cost'])
+        job.customer_id = int(request.form['customer_id'])
+        job.technician_id = int(request.form['technician_id'])
         job.vehicle_registration = request.form['vehicle_registration']
+
         db.session.commit()
         return redirect(url_for('main.jobs'))
+
     return render_template('edit_job.html', job=job, customers=customers, technicians=technicians)
 
 @main.route('/delete_job/<int:job_id>', methods=['POST'])
@@ -306,12 +266,6 @@ def job_complete(job_id):
     job = Job.query.get_or_404(job_id)
     return render_template('job_complete.html', job=job)
 
-@main.route('/download_job_pdf/<int:job_id>')
-@login_required
-def download_job_pdf(job_id):
-    filename = f"job_{job_id}_summary.pdf"
-    return send_from_directory('app/static/pdfs', filename, as_attachment=True)
-
 @main.route('/staff')
 @login_required
 def staff_dashboard():
@@ -332,3 +286,71 @@ def accept_job(job_id):
     job.accepted = True
     db.session.commit()
     return redirect(url_for('main.technician_dashboard'))
+
+@main.route('/log_shift/<int:tech_id>', methods=['GET', 'POST'])
+def log_shift(tech_id):
+    technician = Technician.query.get_or_404(tech_id)
+    today = date.today()
+    shift = ShiftLog.query.filter_by(technician_id=tech_id, date=today).first()
+
+    if request.method == 'POST':
+        if not shift:
+            start = request.form.get('start_time')
+            if not start:
+                flash("Start time is required.", "danger")
+                return redirect(request.url)
+            try:
+                start_time = datetime.strptime(start, '%H:%M').time()
+            except ValueError:
+                flash("Invalid start time format.", "danger")
+                return redirect(request.url)
+
+            shift = ShiftLog(
+                technician_id=tech_id,
+                date=today,
+                start_time=start_time
+            )
+            db.session.add(shift)
+            db.session.commit()
+            flash("Start time logged.", "success")
+
+        elif shift and not shift.end_time:
+            end = request.form.get('end_time')
+            if not end:
+                flash("End time is required.", "danger")
+                return redirect(request.url)
+            try:
+                end_time = datetime.strptime(end, '%H:%M').time()
+            except ValueError:
+                flash("Invalid end time format.", "danger")
+                return redirect(request.url)
+
+            shift.end_time = end_time
+            db.session.commit()
+            flash("End time logged.", "success")
+
+        return redirect(url_for('main.staff_dashboard'))
+
+    return render_template('log_shift.html', technician=technician, shift=shift)
+
+@main.route('/generate_weekly_summary/<int:tech_id>')
+@login_required
+def generate_weekly_summary(tech_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.dashboard'))
+
+    filename = generate_weekly_summary_pdf(tech_id)
+    if filename:
+        flash("Weekly summary PDF generated.", "success")
+        return send_from_directory('app/static/pdfs', filename, as_attachment=True)
+    else:
+        flash("Could not generate PDF.", "danger")
+        return redirect(url_for('main.staff_dashboard'))
+
+@main.route('/download_pdf/<filename>')
+@login_required
+def download_pdf(filename):
+    return send_from_directory('app/static/pdfs', filename, as_attachment=True)
+
+

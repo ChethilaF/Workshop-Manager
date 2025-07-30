@@ -11,12 +11,11 @@ h2 {
 }
 
 .btn-add {
-  background-color: 	#9424a3;
+  background-color: #9424a3;
   color: rgb(255, 255, 255);
   padding: 10px 15px;
   border-radius: 6px;
   text-decoration: none;
-  margin-right: 0px;
   font-weight: bold;
   transition: background-color 0.3s ease;
 }
@@ -26,7 +25,7 @@ h2 {
   color: #000000;
 }
 
-.customer-list {
+.technician-list {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,33 +36,31 @@ h2 {
   padding: 0;
 }
 
-.customer-item {
+.technician-item {
   background-color: rgb(0, 0, 0);
   border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  margin-right: 00px;
-  margin-left: 0px;
   width: calc(100% - 100px);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
 }
 
-.customer-info span {
+.technician-info span {
   font-size: 18px;
 }
 
-.customer-info small {
-  font-size: 14px;
-  color: #ccc;
+.technician-info small {
+  font-size: 15px;
+  color: #c9c9c9;
 }
 
-.customer-actions {
+.technician-actions {
   display: flex;
 }
 
-.btn-edit{
+.btn-edit {
   background-color: #9424a3;
   color: white;
   padding: 10px 10px 10px 10px;
@@ -79,6 +76,7 @@ h2 {
   display: flex;
   align-items: center;
 }
+
 .btn-delete {
   background-color: #9424a3;
   color: white;
@@ -99,7 +97,6 @@ h2 {
 .btn-edit i,
 .btn-delete i {
   margin-right: 5px;
-  
 }
 
 .btn-edit:hover {
@@ -114,5 +111,4 @@ h2 {
 
 .delete-form {
   display: inline;
-
 }

@@ -7,12 +7,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="technician-form-container">
+<div class="form-container">
   <h2>Add New Technician</h2>
   <form method="POST">
     <div class="input-group">
+      <i class="fas fa-user-circle"></i>
+      <input type="text" name="username" placeholder="Username" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="password" placeholder="Password" required>
+    </div>
+    <div class="input-group">
       <i class="fas fa-user"></i>
-      <input type="text" name="name" placeholder="Full name" required>
+      <input type="text" name="name" placeholder="Full Name" required>
     </div>
     <div class="input-group">
       <i class="fas fa-phone"></i>
@@ -23,13 +31,17 @@
       <input type="text" name="specialization" placeholder="Specialization">
     </div>
     <div class="input-group">
-      <i class="fas fa-id-badge"></i>
-      <input type="number" name="user_id" placeholder="Custom User ID" required>
+      <i class="fas fa-shield-alt"></i>
+      <select name="role" required>
+        <option value="" disabled selected>Select Access Level</option>
+        <option value="technician">Technician</option>
+        <option value="viewer">Viewer (Limited)</option>
+      </select>
     </div>
     <button type="submit" class="btn-submit">Add Technician</button>
+    <div class="back-link">
+      <a href="{{ url_for('main.technicians') }}">Back to Technicians</a>
+    </div>
   </form>
-  <div class="back-link">
-    <a href="{{ url_for('main.technicians') }}">&larr; Back to Technicians</a>
-  </div>
 </div>
 {% endblock %}

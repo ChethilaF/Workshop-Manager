@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Workshop Manager{% endblock %}</title>
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css" />
   <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
@@ -14,23 +15,33 @@
   {% if not hide_navbar %}
   <div class="top-bar-wrapper">
     <div class="header-logo">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="Mozita" />
+      <a href="{{ url_for('main.staff_dashboard') }}">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Mozita" />
+      </a>
     </div>
     <header class="top-nav">
+      <div class="hamburger" onclick="toggleMobileNav()">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
       <nav class="nav-right">
         <ul>
           {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-          <li><a href="{{ url_for('main.customers') }}">Customers</a></li>
-          <li><a href="{{ url_for('main.technicians') }}">Technicians</a></li>
-          <li><a href="{{ url_for('main.jobs') }}">Jobs</a></li>
+          <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+          <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+          <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+          <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+          {% if current_user.role == 'admin' %}
+          <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
+          {% endif %}
           <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
           {% endif %}
         </ul>
       </nav>
       {% if current_user.is_authenticated %}
       <div class="user-profile" onclick="toggleUserPopup()">
-        <img src="{{ url_for('static', filename='1734374232663.jpg') }}" alt="User Profile">
+        <img src="{{ url_for('static', filename='Profile_image.jpg') }}" alt="User Profile">
         <div class="user-popup" id="user-popup">
           <p><strong>Name:</strong> {{ current_user.username }}</p>
           <p><strong>Role:</strong> {{ current_user.role }}</p>
@@ -41,21 +52,35 @@
   </div>
   {% endif %}
 
-  <div class="page-wrapper">
-    <main class="main-content">
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      <div class="alerts">
-        {% for category, message in messages %}
-        <div class="alert {{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
+  <div class="mobile-nav" id="mobile-nav">
+    <span class="close-btn" onclick="toggleMobileNav()">&times;</span>
+    <ul>
+      {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+      <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+      <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+      <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+      {% if current_user.role == 'admin' %}
+      <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
       {% endif %}
-      {% endwith %}
-
-      {% block content %}{% endblock %}
-    </main>
+      <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
+      {% endif %}
+    </ul>
   </div>
+
+  <main class="main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alerts">
+      {% for category, message in messages %}
+      <div class="alert {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
 
   <script>
     function toggleUserPopup() {
@@ -70,6 +95,11 @@
         popup.style.display = 'none';
       }
     });
+
+    function toggleMobileNav() {
+      const nav = document.getElementById('mobile-nav');
+      nav.classList.toggle('open');
+    }
   </script>
 </body>
 

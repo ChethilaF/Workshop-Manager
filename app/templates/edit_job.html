@@ -1,36 +1,57 @@
 {% extends "layout.html" %}
 {% block title %}Edit Job{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='edit_job.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Edit Job</h2>
-<form method="POST">
-    <input type="text" name="description" value="{{ job.description }}" required><br><br>
+<div class="job-form-container">
+  <h2>Edit Job</h2>
+  <form method="POST">
+    <div class="input-group">
+      <i class="fas fa-briefcase"></i>
+      <input type="text" name="description" value="{{ job.description }}" placeholder="Job description" required>
+    </div>
     <label>Start Date:</label>
-    <input type="date" name="start_date" value="{{ job.start_date }}"><br><br>
+    <div class="input-group">
+      <i class="fas fa-calendar-alt"></i>
+      <input type="date" name="start_date" value="{{ job.start_date }}">
+    </div>
     <label>End Date:</label>
-    <input type="date" name="end_date" value="{{ job.end_date }}"><br><br>
+    <div class="input-group">
+      <i class="fas fa-calendar-check"></i>
+      <input type="date" name="end_date" value="{{ job.end_date }}">
+    </div>
     <label>Status:</label>
     <select name="status">
-        <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
-        <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
-        <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
-    </select><br><br>
+      <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
+      <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
+      <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
+    </select>
     <label>Total Cost ($):</label>
-    <input type="number" name="total_cost" step="0.01" value="{{ job.total_cost }}"><br><br>
+    <div class="input-group">
+      <i class="fas fa-dollar-sign"></i>
+      <input type="number" name="total_cost" step="0.01" value="{{ job.total_cost }}">
+    </div>
     <label>Customer:</label>
     <select name="customer_id">
-        {% for customer in customers %}
-        <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>{{ customer.name }}
-        </option>
-        {% endfor %}
-    </select><br><br>
+      {% for customer in customers %}
+      <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>{{ customer.name }}</option>
+      {% endfor %}
+    </select>
     <label>Technician:</label>
     <select name="technician_id">
-        {% for tech in technicians %}
-        <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>{{ tech.name }}</option>
-        {% endfor %}
-    </select><br><br>
-    <label for="vehicle_registration">Vehicle Registration:</label><br>
-    <input type="text" name="vehicle_registration" value="{{ job.vehicle_registration }}" required><br><br>
-    <input type="submit" value="Update Job">
-</form>
+      {% for tech in technicians %}
+      <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>{{ tech.name }}</option>
+      {% endfor %}
+    </select>
+    <div class="input-group">
+      <i class="fas fa-car"></i>
+      <input type="text" name="vehicle_registration" value="{{ job.vehicle_registration }}" placeholder="Vehicle Registration (e.g. ABC123)" required>
+    </div>
+    <button type="submit" class="btn-submit">Update Job</button>
+  </form>
+</div>
 {% endblock %}

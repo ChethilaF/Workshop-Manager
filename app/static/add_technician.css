@@ -1,34 +1,42 @@
-body {
-  background-color: #3B5998;
-  font-family: 'Raleway', sans-serif;
-  margin: 0;
-  padding: 0;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-}
+/* Shared design language with add_job.css */
 
+.customer-form-container,
 .technician-form-container {
-  margin-top: 40px;
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 30px 40px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  max-width: 500px;
-  width: 100%;
+  background-color: #1f1f1f;
+  padding: 40px;
+  margin: 40px auto;
+  border-radius: 12px;
+  max-width: 480px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  color: white;
+  font-family: 'Raleway', sans-serif;
 }
 
 h2 {
   text-align: center;
-  margin-bottom: 20px;
   color: white;
+  margin-bottom: 30px;
 }
 
 .input-group {
   position: relative;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 14px 14px 14px 45px;
+  background-color: #000000;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 15px;
+  font-family: 'Raleway', sans-serif;
+}
+
+.input-group input::placeholder {
+  color: #ccc;
 }
 
 .input-group i {
@@ -36,29 +44,14 @@ h2 {
   left: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: #aaa;
+  color: #9424a3;
   font-size: 16px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 12px 12px 12px 40px;
-  border: none;
-  border-radius: 8px;
-  background-color: #e0e0e0;
-  font-size: 16px;
-  color: #000;
-  font-family: 'Raleway', sans-serif;
-}
-
-.input-group input::placeholder {
-  color: #555;
 }
 
 .btn-submit {
   width: 100%;
   padding: 12px;
-  background-color: #1e90ff;
+  background-color: #9424a3;
   border: none;
   color: white;
   font-weight: bold;
@@ -67,11 +60,11 @@ h2 {
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-family: 'Raleway', sans-serif;
-  margin-top: 10px;
 }
 
 .btn-submit:hover {
-  background-color: #0b6fcc;
+  background-color: #00C8DF;
+  color: #000000;
 }
 
 .back-link {
@@ -81,17 +74,24 @@ h2 {
 }
 
 .back-link a {
-  color: #00aced;
+  color: #ffffff;
   text-decoration: none;
+  background-color: #9424a3;
+  padding: 5px 12px;
+  border-radius: 40px;
+  transition: background-color 0.3s ease;
 }
 
 .back-link a:hover {
-  text-decoration: underline;
+  color: #000000;
+  background-color: #00C8DF;
 }
 
 @media screen and (max-width: 768px) {
+  .customer-form-container,
   .technician-form-container {
     margin: 20px;
     padding: 20px;
+    width: calc(100% - 40px);
   }
 }

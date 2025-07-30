@@ -2,10 +2,14 @@
 
 {% block content %}
 <h2>Admin Dashboard</h2>
-<p>Welcome, {{ current_user.username }}!</p>
+<p>Welcome, {{ current_user.username }}!
+You have administrative privileges.</p>
+<p>Here you can manage the system settings, users, and other administrative tasks.</p>
+</p>
 <ul>
-    <li><a href="#">Manage Jobs</a></li>
-    <li><a href="#">View Reports</a></li>
-    <li><a href="#">Add Users</a></li>
+    <li><a href="{{ url_for('main.staff_dashboard') }}">Staff Dashboard</a></li>
+    <li><a href="{{ url_for('main.jobs') }}">Manage Jobs</a></li>
+    <li><a href="{{ url_for('main.customers') }}">Manage Customers</a></li>
+    <li><a href="{{ url_for('main.download_pdf', filename='example.pdf') }}">PDFs</a></li>
 </ul>
 {% endblock %}

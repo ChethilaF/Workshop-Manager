@@ -3,10 +3,14 @@
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="login.css" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+  <link rel="stylesheet" href="home.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
 {% endblock %}
 {% block content %}
+
+<background>
+  <img src="{{ url_for('static', filename='login_image.jpg') }}" alt="Background Image" class="background-image">
+</background>
 
 <div class="home-container">
   
@@ -25,9 +29,6 @@
 
   <button type="submit">Sign In</button>
 </form>
-  <p class="register-link">
-    Don’t have an account? <a href="{{ url_for('main.register') }}">Register here</a>
-  </p>
 </div>
 {% endblock %}
 

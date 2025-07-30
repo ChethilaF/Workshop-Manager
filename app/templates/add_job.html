@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block title %}Add Job{% endblock %}
 
 {% block extra_css %}
@@ -14,43 +15,54 @@
       <i class="fas fa-briefcase"></i>
       <input type="text" name="description" placeholder="Job description" required>
     </div>
-    <label for="start_date">Start Date:</label>
+
     <div class="input-group">
-      <i class="fas fa-calendar-alt"></i>
+      <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
       <input type="date" name="start_date">
     </div>
-    <label for="end_date">End Date:</label>
+
     <div class="input-group">
-      <i class="fas fa-calendar-check"></i>
+      <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
       <input type="date" name="end_date">
     </div>
-    <label for="status">Status:</label>
-    <select name="status">
-      <option value="Pending">Pending</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-    </select>
-    <label for="total_cost">Total Cost ($):</label>
+
+    <div class="input-group">
+      <label for="status"><i class="fas fa-tasks"></i> Status:</label>
+      <select name="status">
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </div>
+
     <div class="input-group">
       <i class="fas fa-dollar-sign"></i>
-      <input type="number" name="total_cost" step="0.01">
+      <input type="number" name="total_cost" step="0.01" placeholder="Total Cost ($)">
     </div>
-    <label for="customer_id">Customer:</label>
-    <select name="customer_id">
-      {% for customer in customers %}
-      <option value="{{ customer.id }}">{{ customer.name }}</option>
-      {% endfor %}
-    </select>
-    <label for="technician_id">Technician:</label>
-    <select name="technician_id">
-      {% for tech in technicians %}
-      <option value="{{ tech.id }}">{{ tech.name }}</option>
-      {% endfor %}
-    </select>
+
+    <div class="input-group">
+      <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
+      <select name="customer_id">
+        {% for customer in customers %}
+        <option value="{{ customer.id }}">{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
+      <select name="technician_id">
+        {% for tech in technicians %}
+        <option value="{{ tech.id }}">{{ tech.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
     <div class="input-group">
       <i class="fas fa-car"></i>
       <input type="text" name="vehicle_registration" placeholder="Vehicle Registration (e.g. ABC123)" required>
     </div>
+
     <button type="submit" class="btn-submit">Add Job</button>
   </form>
 </div>
