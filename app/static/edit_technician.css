@@ -19,6 +19,7 @@
   margin-bottom: 15px;
   border-radius: 8px;
   padding: 10px;
+
 }
 
 .input-group i {
@@ -27,68 +28,46 @@
   font-size: 1.2rem;
 }
 
-.input-group input,
-.input-group select {
+.input-group input {
   background: transparent;
   border: none;
   border-bottom: 2px solid #9b28b1;
   color: #fff;
-  font-size: 16px;
   flex: 1;
   padding: 8px;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
-.input-group input[type="date"],
-.input-group input[type="number"] {
-  color-scheme: dark;
-}
-
-.input-group select:focus,
-.input-group input:focus {
-  outline: none;
-}
-
-.input-group label {
-  font-weight: 500;
-  margin-right: 0.5rem;
-  color: #ccc;
+  font-size: 16px;
 }
 
 .btn-submit {
-  display: block;
   width: 100%;
-  padding: 0.75rem;
-  background-color: #9c27b0;
+  padding: 12px;
+  background-color: #9b28b1;
   color: #fff;
-  font-size: 1rem;
-  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  border-radius: 40px;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
   transition: background-color 0.3s ease;
 }
 
 .btn-submit:hover {
-  background-color: #6a0080;
+  background-color: #00C8DF;
+  color: #000000;
 }
 
 .back-button {
-  display: inline-block;
-  color: #9c27b0;
+  color: #9b28b1;
   text-decoration: none;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
+  font-weight: bold;
+  display: inline-block;
 }
 
-.back-button i {
-  margin-right: 5px;
+.back-button:hover {
+  text-decoration: underline;
+  color: #00C8DF;
 }
 
-/* Mobile responsive tweaks */
 @media (max-width: 600px) {
   .job-form-container {
     margin: 1rem;

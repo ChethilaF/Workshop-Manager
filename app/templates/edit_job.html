@@ -8,49 +8,100 @@
 
 {% block content %}
 <div class="job-form-container">
+  <a href="{{ url_for('main.jobs') }}" class="back-button">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+
   <h2>Edit Job</h2>
   <form method="POST">
+
+    <label>Job Title :</label>
     <div class="input-group">
       <i class="fas fa-briefcase"></i>
       <input type="text" name="description" value="{{ job.description }}" placeholder="Job description" required>
     </div>
-    <label>Start Date:</label>
+
+    <label>Start Date :</label>
     <div class="input-group">
       <i class="fas fa-calendar-alt"></i>
       <input type="date" name="start_date" value="{{ job.start_date }}">
     </div>
-    <label>End Date:</label>
+
+    <label>End Date :</label>
     <div class="input-group">
       <i class="fas fa-calendar-check"></i>
       <input type="date" name="end_date" value="{{ job.end_date }}">
     </div>
-    <label>Status:</label>
-    <select name="status">
-      <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
-      <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
-      <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
-    </select>
-    <label>Total Cost ($):</label>
+
+    <label>Status :</label>
+    <div class="input-group">
+      <i class="fas fa-tasks"></i>
+      <select name="status">
+        <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
+        <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
+        <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
+      </select>
+    </div>
+
+    <label>Total Cost ($) :</label>
     <div class="input-group">
       <i class="fas fa-dollar-sign"></i>
       <input type="number" name="total_cost" step="0.01" value="{{ job.total_cost }}">
     </div>
-    <label>Customer:</label>
-    <select name="customer_id">
-      {% for customer in customers %}
-      <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>{{ customer.name }}</option>
-      {% endfor %}
-    </select>
-    <label>Technician:</label>
-    <select name="technician_id">
-      {% for tech in technicians %}
-      <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>{{ tech.name }}</option>
-      {% endfor %}
-    </select>
+
+    <label>Payment Status :</label>
+    <div class="input-group">
+      <i class="fas fa-credit-card"></i>
+      <select name="payment_status">
+        <option value="Unpaid" {% if job.payment_status=='Unpaid' %}selected{% endif %}>Unpaid</option>
+        <option value="Paid" {% if job.payment_status=='Paid' %}selected{% endif %}>Paid</option>
+      </select>
+    </div>
+
+    <label>Customer :</label>
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <select name="customer_id">
+        {% for customer in customers %}
+          <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <label>Technician :</label>
+    <div class="input-group">
+      <i class="fas fa-user-cog"></i>
+      <select name="technician_id">
+        {% for tech in technicians %}
+          <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>{{ tech.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <label>Vehicle Make :</label>
     <div class="input-group">
       <i class="fas fa-car"></i>
+      <input type="text" name="vehicle_make" value="{{ job.vehicle_make }}" placeholder="Vehicle Make (e.g. Toyota)" required>
+    </div>
+
+    <label>Vehicle Model:</label>
+    <div class="input-group">
+      <i class="fas fa-car"></i>
+      <input type="text" name="vehicle_model" value="{{ job.vehicle_model }}" placeholder="Vehicle Model (e.g. Corolla)" required>
+    </div>
+
+    <label>Vehicle Year:</label>
+    <div class="input-group">
+      <i class="fas fa-calendar"></i>
+      <input type="number" name="vehicle_year" value="{{ job.vehicle_year }}" placeholder="Vehicle Year (e.g. 2020)" required>
+    </div>
+
+    <label>Vehicle Registration:</label>
+    <div class="input-group">
+      <i class="fas fa-id-card"></i>
       <input type="text" name="vehicle_registration" value="{{ job.vehicle_registration }}" placeholder="Vehicle Registration (e.g. ABC123)" required>
     </div>
+
     <button type="submit" class="btn-submit">Update Job</button>
   </form>
 </div>

@@ -1,13 +1,32 @@
 {% extends "layout.html" %}
 {% block title %}Edit Technician{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='edit_technician.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Edit Technician</h2>
-<form method="POST">
-  <input type="text" name="name" value="{{ technician.name }}" required><br><br>
-  <input type="email" name="email" value="{{ technician.email }}"><br><br>
-  <input type="text" name="phone" value="{{ technician.phone }}"><br><br>
-  <input type="text" name="specialization" value="{{ technician.specialization }}"><br><br>
-  <input type="submit" value="Update Technician">
-</form>
-<a href="{{ url_for('main.technicians') }}">← Back to Technicians</a>
+<div class="job-form-container">
+  <a href="{{ url_for('main.technicians') }}" class="back-button">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+
+  <h2>Edit Technician</h2>
+  <form method="POST">
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="name" value="{{ technician.name }}" placeholder="Full Name" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input type="text" name="phone" value="{{ technician.phone }}" placeholder="Phone">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-tools"></i>
+      <input type="text" name="specialization" value="{{ technician.specialization }}" placeholder="Specialization">
+    </div>
+    <button type="submit" class="btn-submit">Update Technician</button>
+  </form>
+</div>
 {% endblock %}

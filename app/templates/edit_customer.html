@@ -1,13 +1,36 @@
 {% extends "layout.html" %}
 {% block title %}Edit Customer{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='edit_customer.css') }}">
+{% endblock %}
+
 {% block content %}
-<h2>Edit Customer</h2>
-<form method="POST">
-  <input type="text" name="name" value="{{ customer.name }}" required><br><br>
-  <input type="email" name="email" value="{{ customer.email }}"><br><br>
-  <input type="text" name="phone" value="{{ customer.phone }}"><br><br>
-  <input type="text" name="address" value="{{ customer.address }}"><br><br>
-  <input type="submit" value="Update Customer">
-</form>
-<a href="{{ url_for('main.customers') }}">← Back to Customers</a>
+<div class="customer-form-container">
+  <a href="{{ url_for('main.customers') }}" class="back-button">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+
+  <h2>Edit Customer</h2>
+  <form method="POST">
+    <div class="input-group">
+      <i class="fas fa-user"></i>
+      <input type="text" name="name" value="{{ customer.name }}" placeholder="Full name" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" name="email" value="{{ customer.email }}" placeholder="Email (optional)">
+    </div>
+    <div class="input-group">
+      <i class="fas fa-phone"></i>
+      <input type="text" name="phone" value="{{ customer.phone }}" placeholder="Phone" required>
+    </div>
+    <div class="input-group">
+      <i class="fas fa-map-marker-alt"></i>
+      <input type="text" name="address" value="{{ customer.address }}" placeholder="Address (optional)">
+    </div>
+    <button type="submit" class="btn-submit">Update Customer</button>
+  </form>
+</div>
 {% endblock %}

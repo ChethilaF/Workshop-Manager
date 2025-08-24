@@ -9,6 +9,9 @@
 
 {% block content %}
 <div class="job-form-container">
+  <div class="back-link">
+    <a href="{{ url_for('main.jobs') }}"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
   <h2>Add New Job</h2>
   <form method="POST">
     <div class="input-group">
@@ -25,6 +28,9 @@
       <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
       <input type="date" name="end_date">
     </div>
+
+    <label>Target Duration (minutes):</label>
+    <input type="number" name="target_duration" min="1" placeholder="90">
 
     <div class="input-group">
       <label for="status"><i class="fas fa-tasks"></i> Status:</label>
@@ -63,7 +69,38 @@
       <input type="text" name="vehicle_registration" placeholder="Vehicle Registration (e.g. ABC123)" required>
     </div>
 
+    <div class="input-group">
+      <i class="fas fa-car-side"></i>
+      <input type="text" name="vehicle_make" placeholder="Vehicle Make (e.g. Toyota)" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-car"></i>
+      <input type="text" name="vehicle_model" placeholder="Vehicle Model (e.g. Camry)" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-calendar"></i>
+      <input type="text" name="vehicle_year" placeholder="Vehicle Year (e.g. 2020)" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-paint-brush"></i>
+      <input type="text" name="vehicle_color" placeholder="Vehicle Color (e.g. Red)" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-dollar-sign"></i>
+      <input type="text" name="total_cost" placeholder="Total Cost ($)" required>
+    </div>
+
+    <div class="input-group">
+      <i class="fas fa-info-circle"></i>
+      <textarea name="notes" placeholder="Additional Notes (optional)"></textarea>
+    </div>
+
     <button type="submit" class="btn-submit">Add Job</button>
   </form>
+  
 </div>
 {% endblock %}

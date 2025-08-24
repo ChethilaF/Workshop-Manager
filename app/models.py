@@ -37,6 +37,25 @@ class Technician(db.Model):
     user_id = db.Column(db.Integer, unique=True, nullable=False)
     jobs = db.relationship('Job', back_populates='technician', cascade="all, delete-orphan")
 
+class JobsDone(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    job_id = db.Column(db.Integer)
+    description = db.Column(db.String(255))
+    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.DateTime)
+    total_work_duration = db.Column(db.Integer)
+    vehicle_registration = db.Column(db.String(50))
+    vehicle_model = db.Column(db.String(100))
+    vehicle_year = db.Column(db.String(4))
+    vehicle_color = db.Column(db.String(50))
+    total_cost = db.Column(db.Numeric(10, 2), default=0.00)
+    customer_name = db.Column(db.String(100))
+    technician_name = db.Column(db.String(100))
+    pause_summary = db.Column(db.Text)
+
+    def __repr__(self):
+        return f"<JobsDone {self.job_id} by {self.technician_name}>"
+        
 class Job(db.Model):
     __tablename__ = 'job'
     id = db.Column(db.Integer, primary_key=True)
@@ -51,6 +70,8 @@ class Job(db.Model):
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
     total_work_duration = db.Column(db.Integer, default=0)
+    target_duration = db.Column(db.String(20), default='00:00:00')
+    pauses = db.relationship('PauseLog', backref='job', cascade="all, delete-orphan")
     pause_reason = db.Column(db.Text)
     paused_at = db.Column(db.DateTime)
     resume_at = db.Column(db.DateTime)
@@ -77,3 +98,13 @@ class ShiftLog(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'), nullable=False)
+    endpoint = db.Column(db.String(500), nullable=False)
+    p256dh = db.Column(db.String(255), nullable=False)
+    auth = db.Column(db.String(255), nullable=False)
+
+    technician = db.relationship('Technician', backref='push_subscriptions')

@@ -1,17 +1,85 @@
 {% extends "layout.html" %}
-{% block title %}Jobs for {{ technician.name }}{% endblock %}
+{% block title %}My Jobs{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  .jobs-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #111;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+  }
+  .job-card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-left: 5px solid #9424a3;
+  }
+  .job-card h3 {
+    margin-top: 0;
+    color: #ff80ff;
+  }
+  .job-card p {
+    margin: 5px 0;
+  }
+  .action-buttons form,
+  .action-buttons a {
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 10px;
+  }
+  .action-buttons button,
+  .action-buttons a.button-link {
+    background-color: #9424a3;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    text-decoration: none;
+  }
+  .action-buttons button:hover,
+  .action-buttons a.button-link:hover {
+    background-color: #00C8DF;
+    color: #000;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Jobs assigned to {{ technician.name }}</h2>
-{% if jobs %}
-<ul>
-  {% for job in jobs %}
-  <li>
-    <strong>{{ job.description }}</strong><br>
-    Status: {{ job.status }}<br>
-    Start: {{ job.start_date }} | End: {{ job.end_date }} | Cost: ${{ job.total_cost }}<br>
-    Customer: {{ job.customer.name }}
-  </li>
-  {% endfor %}
-</ul>
-{% else %}<p>No jobs assigned yet.</p>{% endif %}
+<div class="jobs-container">
+  <h2>Jobs for {{ technician.name }}</h2>
+  {% if jobs %}
+    {% for job in jobs %}
+    <div class="job-card">
+      <h3>{{ job.description }}</h3>
+      <p><strong>Status:</strong> {{ job.status }}</p>
+      <p><strong>Vehicle:</strong> {{ job.vehicle_registration }}</p>
+      <p><strong>Customer:</strong> {{ job.customer.name }}</p>
+      <p><strong>Start:</strong> {{ job.start_date or 'N/A' }}</p>
+      <p><strong>End:</strong> {{ job.end_date or 'N/A' }}</p>
+
+      <div class="action-buttons">
+        {% if not job.accepted %}
+        <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
+          <button type="submit">Accept Job</button>
+        </form>
+        <a href="{{ url_for('main.staff_dashboard') }}" class="button-link">Decline</a>
+        {% else %}
+        <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="button-link">Enter Job Control</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>No jobs assigned to you.</p>
+  {% endif %}
+</div>
 {% endblock %}

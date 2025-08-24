@@ -3,8 +3,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from app import db
-from app.models import User, Customer, Technician, Job, PauseLog
+from app.models import User
+from app.models import Customer, Technician, Job, PauseLog, JobsDone
 from app.utils.pdf_generator import generate_job_pdf
+from threading import Timer
+from flask import session
+pause_timers = {}
 
 main = Blueprint('main', __name__)
 
@@ -179,6 +183,7 @@ def add_job():
                 start_date=start_date,
                 end_date=end_date,
                 status=request.form['status'],
+                target_duration=request.form.get('target_duration', '00:00:00'),
                 total_cost=request.form['total_cost'],
                 customer_id=request.form['customer_id'],
                 technician_id=request.form['technician_id'],
@@ -228,37 +233,148 @@ def delete_job(job_id):
 @login_required
 def job_control(job_id):
     job = Job.query.get_or_404(job_id)
+
     if request.method == 'POST':
         action = request.form.get('action')
 
-        if action == 'start':
+        if action == 'start' and not job.start_time:
             job.start_time = datetime.utcnow()
 
         elif action == 'pause':
+            pause_reason = request.form.get('pause_reason', '')
             pause = PauseLog(
                 job_id=job.id,
                 paused_at=datetime.utcnow(),
-                reason=request.form.get('pause_reason', '')
+                reason=pause_reason if pause_reason else ""
             )
             db.session.add(pause)
+            db.session.commit()
+
+            def auto_resume():
+                latest_pause = PauseLog.query.filter_by(
+                    job_id=job.id,
+                    resumed_at=None
+                ).order_by(PauseLog.paused_at.desc()).first()
+                if latest_pause and not latest_pause.reason:
+                    latest_pause.resumed_at = datetime.utcnow()
+                    job.total_work_duration += int(
+                        (latest_pause.resumed_at - latest_pause.paused_at).total_seconds()
+                    )
+                    db.session.commit()
+
+            timer = Timer(300, auto_resume)
+            timer.start()
+            pause_timers[job_id] = timer
 
         elif action == 'resume':
-            pause = PauseLog.query.filter_by(job_id=job.id, resumed_at=None).order_by(PauseLog.paused_at.desc()).first()
+            pause = PauseLog.query.filter_by(
+                job_id=job.id,
+                resumed_at=None
+            ).order_by(PauseLog.paused_at.desc()).first()
             if pause:
                 pause.resumed_at = datetime.utcnow()
-                job.total_work_duration += int((pause.resumed_at - pause.paused_at).total_seconds())
+                job.total_work_duration += int(
+                    (pause.resumed_at - pause.paused_at).total_seconds()
+                )
+                if job.id in pause_timers:
+                    pause_timers[job.id].cancel()
+                    del pause_timers[job.id]
+                db.session.commit()
 
         elif action == 'stop':
-            pause = PauseLog.query.filter_by(job_id=job.id, resumed_at=None).order_by(PauseLog.paused_at.desc()).first()
+            pause = PauseLog.query.filter_by(
+                job_id=job.id,
+                resumed_at=None
+            ).order_by(PauseLog.paused_at.desc()).first()
             if pause:
                 pause.resumed_at = datetime.utcnow()
-                job.total_work_duration += int((pause.resumed_at - pause.paused_at).total_seconds())
+                job.total_work_duration += int(
+                    (pause.resumed_at - pause.paused_at).total_seconds()
+                )
             job.end_time = datetime.utcnow()
-            generate_job_pdf(job, job.technician)
-            return redirect(url_for('main.job_complete', job_id=job.id))
+            job.status = "Waiting for Approval"
 
         db.session.commit()
-    return render_template('job_control.html', job=job)
+
+    # Pass VAPID public key to template for push subscription
+    import os
+    vapid_public_key = os.getenv("VAPID_PUBLIC_KEY")
+
+    return render_template(
+        'job_control.html',
+        job=job,
+        vapid_public_key=vapid_public_key
+    )
+
+@main.route('/jobs/waiting_approval')
+@login_required
+def jobs_waiting_approval():
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.dashboard'))
+
+    waiting_jobs = Job.query.filter_by(status="Waiting for Approval").all()
+    return render_template('waiting_approval.html', jobs=waiting_jobs)
+
+@main.route('/jobs/approve/<int:job_id>', methods=['POST'])
+@login_required
+def approve_job(job_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.dashboard'))
+
+    job = Job.query.get_or_404(job_id)
+    if job.status == 'Waiting for Approval':
+        job_done = JobsDone(
+            job_id=job.id,
+            vehicle_registration=job.vehicle_registration,
+            description=job.description,
+            start_time=job.start_time,
+            end_time=job.end_time,
+            total_work_duration=job.total_work_duration,
+            customer_name=job.customer.name,
+            technician_name=job.technician.name,
+            pause_summary="\n".join([f"{p.paused_at} - {p.resumed_at or 'Still Paused'}: {p.reason}" for p in job.pauses])
+        )
+        db.session.add(job_done)
+        job.status = 'Completed'
+        db.session.commit()
+        flash('Job approved and marked as completed.', 'success')
+
+    return redirect(url_for('main.jobs_waiting_approval'))
+
+@main.route('/jobs/retry/<int:job_id>', methods=['POST'])
+@login_required
+def retry_job(job_id):
+    if current_user.role != 'admin':
+        flash('Access denied.', 'danger')
+        return redirect(url_for('main.dashboard'))
+
+    job = Job.query.get_or_404(job_id)
+    if job.status == 'Waiting for Approval':
+        job.status = 'Declined at Approval'
+        db.session.commit()
+        flash('Job returned to technician for review.', 'warning')
+
+    return redirect(url_for('main.jobs_waiting_approval'))
+
+@main.route('/job_pdf/<int:job_id>')
+@login_required
+def record_job_done(job):
+    from app.models import JobsDone
+    job = Job.query.get_or_404(job_id)
+    job_done = JobsDone(
+        job_id=job.id,
+        customer_name=job.customer.name,
+        technician_name=job.technician.name,
+        vehicle_registration=job.vehicle_registration,
+        start_time=job.start_time,
+        end_time=job.end_time,
+        total_work_duration=job.total_work_duration,
+        description=job.description
+    )
+    db.session.add(job_done)
+    db.session.commit()
 
 @main.route('/job_complete/<int:job_id>')
 @login_required
@@ -285,7 +401,7 @@ def accept_job(job_id):
     job = Job.query.get_or_404(job_id)
     job.accepted = True
     db.session.commit()
-    return redirect(url_for('main.technician_dashboard'))
+    return redirect(url_for('main.staff_dashboard'))
 
 @main.route('/log_shift/<int:tech_id>', methods=['GET', 'POST'])
 def log_shift(tech_id):
@@ -354,3 +470,39 @@ def download_pdf(filename):
     return send_from_directory('app/static/pdfs', filename, as_attachment=True)
 
 
+
+# Notification system
+import os
+import json
+from app.models import PushSubscription
+from pywebpush import webpush, WebPushException
+
+@main.route('/save-subscription', methods=['POST'])
+@login_required
+def save_subscription():
+    if current_user.role != 'technician':
+        return {"error": "Only technicians can subscribe"}, 403
+
+    data = request.get_json()
+    endpoint = data.get('endpoint')
+    keys = data.get('keys', {})
+    p256dh = keys.get('p256dh')
+    auth_key = keys.get('auth')
+
+    # Avoid duplicates
+    existing = PushSubscription.query.filter_by(
+        technician_id=current_user.id,
+        endpoint=endpoint
+    ).first()
+
+    if not existing:
+        sub = PushSubscription(
+            technician_id=current_user.id,
+            endpoint=endpoint,
+            p256dh=p256dh,
+            auth=auth_key
+        )
+        db.session.add(sub)
+        db.session.commit()
+
+    return {"status": "Subscription saved"}

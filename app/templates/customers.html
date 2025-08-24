@@ -22,7 +22,9 @@
   <li class="customer-item">
     <div class="customer-info">
       <span><strong>{{ customer.name }}</strong></span><br>
-      <small>{{ customer.email }} | {{ customer.phone }} | {{ customer.address }}</small>
+      <small>- {{ customer.email }}</small><br>
+      <small>- {{ customer.phone }}</small><br>
+      <small>- {{ customer.address }}</small>
     </div>
 
     {% if current_user.role == 'admin' %}

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Jobs Waiting Approval{% endblock %}
+
+{% block content %}
+<div class="approval-jobs">
+  <h2>Jobs Waiting for Approval</h2>
+  {% if jobs %}
+    <ul class="approval-list">
+      {% for job in jobs %}
+      <li class="approval-item">
+        <strong>{{ job.description }}</strong><br>
+        Vehicle: {{ job.vehicle_registration }}<br>
+        Technician: {{ job.technician.name }}<br>
+        Customer: {{ job.customer.name }}<br>
+        Duration: {{ job.total_work_duration }} seconds<br>
+        <form method="POST" action="{{ url_for('main.approve_job', job_id=job.id) }}" style="display:inline-block">
+          <button type="submit" class="btn-confirm">Confirm Job</button>
+        </form>
+        <form method="POST" action="{{ url_for('main.retry_job', job_id=job.id) }}" style="display:inline-block">
+          <button type="submit" class="btn-retry">Retry Job</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No jobs waiting for approval.</p>
+  {% endif %}
+</div>
+{% endblock %}

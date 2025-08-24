@@ -7,29 +7,34 @@
 {% endblock %}
 
 {% block content %}
-<div class="form-container">
+<div class="customer-form-container">
+  <a href="{{ url_for('main.customers') }}" class="back-button">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
   <h2>Add New Customer</h2>
   <form method="POST">
     <div class="input-group">
       <i class="fas fa-user"></i>
-      <input type="text" name="name" placeholder="Full name" required>
+      <input type="text" name="name" placeholder="Full Name" required>
     </div>
+
     <div class="input-group">
       <i class="fas fa-phone"></i>
       <input type="text" name="phone" placeholder="Phone" required pattern="^[0-9\-\+]{7,15}$" title="Enter a valid phone number">
     </div>
+
     <div class="input-group">
       <i class="fas fa-envelope"></i>
       <input type="email" name="email" placeholder="Email (optional)">
     </div>
+
     <div class="input-group">
       <i class="fas fa-map-marker-alt"></i>
       <input type="text" name="address" placeholder="Address (optional)">
     </div>
+
     <button type="submit" class="btn-submit">Add Customer</button>
-    <div class="back-link">
-      <a href="{{ url_for('main.customers') }}">Back to Customers</a>
-    </div>
   </form>
+  
 </div>
 {% endblock %}
