@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/weekly_summary_dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block title %}Weekly Summary PDFs{% endblock %}
+
+{% block content %}
+<h2>Weekly Summary PDFs</h2>
+
+<div class="tech-grid">
+    {% for tech in techs %}
+    <div class="tech-circle" id="tech-{{ tech.id }}">
+        <span>{{ tech.name }}</span>
+
+        <!-- PDF list inside the circle, initially hidden -->
+        <div class="pdf-content" style="display: none;">
+            {% set pdfs = get_pdfs_for_tech(tech.id) %}
+            {% if pdfs %}
+            <ul>
+                {% for pdf in pdfs %}
+                <li>
+                    {{ pdf }}
+                    <a href="{{ url_for('main.download_pdf', filename=pdf) }}" class="btn-download">
+                        <i class="fas fa-download"></i> Download
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No PDFs generated yet.</p>
+            {% endif %}
+
+            <form action="{{ url_for('main.generate_weekly_summary', tech_id=tech.id) }}" method="POST">
+                <button type="submit" class="btn-generate">Generate PDF</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.tech-circle').forEach(circle => {
+  circle.addEventListener('click', e => {
+    // If the user clicked a button or a link, let it work normally
+    if (e.target.closest('a') || e.target.closest('button')) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // Collapse all other circles
+    document.querySelectorAll('.tech-circle').forEach(c => {
+      if (c !== circle) {
+        c.classList.remove('expanded');
+        const pdf = c.querySelector('.pdf-content');
+        if (pdf) pdf.style.display = 'none';
+      }
+    });
+
+    // Toggle clicked circle
+    circle.classList.toggle('expanded');
+    const pdfContent = circle.querySelector('.pdf-content');
+    if (pdfContent) {
+      pdfContent.style.display = pdfContent.style.display === 'block' ? 'none' : 'block';
+    }
+  });
+});
+</script>
+{% endblock %}

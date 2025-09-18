@@ -1,85 +1,65 @@
 {% extends "layout.html" %}
+
 {% block title %}My Jobs{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-  .jobs-container {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background-color: #111;
-    color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
-  }
-  .job-card {
-    background-color: #1e1e1e;
-    border-radius: 10px;
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    border-left: 5px solid #9424a3;
-  }
-  .job-card h3 {
-    margin-top: 0;
-    color: #ff80ff;
-  }
-  .job-card p {
-    margin: 5px 0;
-  }
-  .action-buttons form,
-  .action-buttons a {
-    display: inline-block;
-    margin-top: 10px;
-    margin-right: 10px;
-  }
-  .action-buttons button,
-  .action-buttons a.button-link {
-    background-color: #9424a3;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-    text-decoration: none;
-  }
-  .action-buttons button:hover,
-  .action-buttons a.button-link:hover {
-    background-color: #00C8DF;
-    color: #000;
-  }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/staff_jobs.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="jobs-container">
-  <h2>Jobs for {{ technician.name }}</h2>
-  {% if jobs %}
-    {% for job in jobs %}
-    <div class="job-card">
-      <h3>{{ job.description }}</h3>
-      <p><strong>Status:</strong> {{ job.status }}</p>
-      <p><strong>Vehicle:</strong> {{ job.vehicle_registration }}</p>
-      <p><strong>Customer:</strong> {{ job.customer.name }}</p>
-      <p><strong>Start:</strong> {{ job.start_date or 'N/A' }}</p>
-      <p><strong>End:</strong> {{ job.end_date or 'N/A' }}</p>
+<h2>Jobs for {{ technician.name }}</h2>
 
-      <div class="action-buttons">
-        {% if not job.accepted %}
-        <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
-          <button type="submit">Accept Job</button>
-        </form>
-        <a href="{{ url_for('main.staff_dashboard') }}" class="button-link">Decline</a>
-        {% else %}
-        <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="button-link">Enter Job Control</a>
-        {% endif %}
+{% if jobs %}
+<ul class="jobs-list">
+  {% for job in jobs %}
+  <li class="job-card">
+    <div class="job-info">
+      <!-- Job description centered and bigger -->
+      <div class="job-description">
+        {{ job.job_description }}
       </div>
+
+      <!-- Details with icons + dash -->
+      <small><i class="fas fa-tasks"></i> Status - {{ job.status }}</small>
+      <small><i class="fas fa-car"></i> Vehicle Rego - {{ job.vehicle_registration }}</small>
+      <small><i class="fas fa-car-side"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{ job.vehicle_year }}</small>
+      <small>
+        <i class="fas fa-clock"></i> Target Duration - 
+        {% if job.target_duration %}
+            {% set duration = job.target_duration|int %}
+            {% set h = duration // 60 %}
+            {% set m = duration % 60 %}
+            {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
+        {% else %}
+            N/A
+        {% endif %}
+      </small>
+      <small><i class="fas fa-user"></i> Customer - {{ job.customer.name }}</small>
+      <small><i class="fas fa-calendar-alt"></i> Start - {{ job.start_date or 'N/A' }}</small>
+      <small><i class="fas fa-calendar-check"></i> End - {{ job.end_date or 'N/A' }}</small>
     </div>
-    {% endfor %}
-  {% else %}
-    <p>No jobs assigned to you.</p>
-  {% endif %}
-</div>
+
+    <div class="job-actions">
+      {% if not job.accepted %}
+      <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
+        <button type="submit" class="accept-button">
+          <i class="fas fa-check"></i> Accept
+        </button>
+      </form>
+      <a href="{{ url_for('main.staff_dashboard') }}" class="decline-button">
+        <i class="fas fa-times"></i> Decline
+      </a>
+      {% else %}
+      <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="control-button">
+        <i class="fas fa-cogs"></i> Enter Control
+      </a>
+      {% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>No jobs assigned to you.</p>
+{% endif %}
 {% endblock %}

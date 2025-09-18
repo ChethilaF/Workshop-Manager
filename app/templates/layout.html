@@ -5,41 +5,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}Workshop Manager{% endblock %}</title>
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+  <!-- Main CSS for the layout -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
   {% if not hide_navbar %}
   <div class="top-bar-wrapper">
+
+    <!-- Logo linking to staff dashboard -->
     <div class="header-logo">
       <a href="{{ url_for('main.staff_dashboard') }}">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Mozita" />
       </a>
     </div>
+
     <header class="top-nav">
 
+      <!-- Hamburger menu for mobile -->
       <div class="hamburger" onclick="toggleMobileNav()">
         <div></div>
         <div></div>
         <div></div>
       </div>
 
+      <!-- Navigation links -->
       <nav class="nav-right">
         <ul>
           {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
-          <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
-          <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
-          <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+          <li><a href="{{ url_for('main.staff_dashboard') }}"
+              class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+          <li><a href="{{ url_for('main.customers') }}"
+              class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+          <li><a href="{{ url_for('main.technicians') }}"
+              class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+          <li><a href="{{ url_for('main.jobs') }}"
+              class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+
+          <!-- Admin-only link -->
           {% if current_user.role == 'admin' %}
-          <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
+          <li><a href="{{ url_for('main.admin_dashboard') }}"
+              class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
           {% endif %}
+
+          <!-- Logout link -->
           <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
           {% endif %}
         </ul>
       </nav>
+
+      <!-- User profile section with popup -->
       {% if current_user.is_authenticated %}
       <div class="user-profile" onclick="toggleUserPopup()">
         <img src="{{ url_for('static', filename='Profile_image.jpg') }}" alt="User Profile">
@@ -53,42 +71,58 @@
   </div>
   {% endif %}
 
+  <!-- Mobile navigation menu -->
   <div class="mobile-nav" id="mobile-nav">
-    <span class="close-btn" onclick="toggleMobileNav()">&times;</span>
     <ul>
       {% if current_user.is_authenticated %}
-      <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
-      <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
-      <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
-      <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+      <li><a href="{{ url_for('main.staff_dashboard') }}"
+          class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+      <li><a href="{{ url_for('main.customers') }}"
+          class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+      <li><a href="{{ url_for('main.technicians') }}"
+          class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+      <li><a href="{{ url_for('main.jobs') }}"
+          class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
       {% if current_user.role == 'admin' %}
-      <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
+      <li><a href="{{ url_for('main.admin_dashboard') }}"
+          class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
       {% endif %}
       <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
       {% endif %}
     </ul>
   </div>
 
+  <!-- Main content area -->
   <main class="main-content">
+
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    <div class="alerts">
+    <div class="flash-container">
       {% for category, message in messages %}
-      <div class="alert {{ category }}">{{ message }}</div>
+      <div class="flash-message {{ category }}">
+        <span class="flash-text"><i class="fa fa-info-circle"></i> {{ message }}</span>
+        <button class="flash-close" onclick="this.parentElement.style.display='none';">&times;</button>
+      </div>
       {% endfor %}
     </div>
     {% endif %}
     {% endwith %}
 
+
+
+    <!-- Content block for child templates -->
     {% block content %}{% endblock %}
   </main>
 
+  <!-- JS for user popup -->
   <script>
     function toggleUserPopup() {
       const popup = document.getElementById('user-popup');
       popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
     }
 
+    // Close popup if clicked outside
     document.addEventListener('click', function (e) {
       const profile = document.querySelector('.user-profile');
       const popup = document.getElementById('user-popup');
@@ -97,12 +131,16 @@
       }
     });
 
+    // Toggle mobile nav
     function toggleMobileNav() {
       const nav = document.getElementById('mobile-nav');
+      const burger = document.querySelector('.hamburger');
       nav.classList.toggle('open');
+      burger.classList.toggle('active');
     }
   </script>
 
+  <!-- Service Worker registration for push notifications -->
   <script>
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker.register('/static/service-worker.js')
@@ -111,14 +149,14 @@
 
           return registration.pushManager.getSubscription()
             .then(async function (subscription) {
-              if (subscription) {
-                return subscription;
-              }
+              if (subscription) return subscription;
 
+              // Fetch VAPID key from backend
               const response = await fetch('/vapid_public_key');
               const vapidPublicKey = await response.text();
               const convertedKey = urlBase64ToUint8Array(vapidPublicKey);
 
+              // Subscribe for push notifications
               return registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: convertedKey
@@ -126,18 +164,18 @@
             });
         })
         .then(function (subscription) {
+          // Send subscription to backend
           fetch('/save_subscription', {
             method: 'POST',
             body: JSON.stringify(subscription),
-            headers: {
-              'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
           });
         })
         .catch(function (error) {
           console.error('Service Worker Error:', error);
         });
 
+      // Utility to convert VAPID key
       function urlBase64ToUint8Array(base64String) {
         const padding = '='.repeat((4 - base64String.length % 4) % 4);
         const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -146,6 +184,9 @@
       }
     }
   </script>
+
+  <!-- Extra JS block for child templates -->
+  {% block extra_js %}{% endblock %}
 </body>
 
 </html>

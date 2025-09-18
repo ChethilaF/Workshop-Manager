@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}Page Not Found{% endblock %}
+
+{% block extra_css %}
+<!-- Linking the 404-specific stylesheet -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/404.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="body-content">
+    <!-- Container for centering the error message -->
+    <div class="error-container">
+        <!-- Large heading for the 404 error code -->
+        <h1>404</h1>
+        <!-- Description text -->
+        <p>Oops! The page you’re looking for doesn’t exist.</p>
+        <!-- Back button with accessibility support -->
+        <a href="{{ url_for('main.staff_dashboard') }}" class="btn btn-primary" aria-label="Go back to home page">
+            <i class="fas fa-home"></i> Go Back Home
+        </a>
+
+        <!-- Optional: Provide a search link if users land here frequently -->
+        <p class="mt-3">
+            <a href="{{ url_for('main.staff_dashboard') }}">Return to Dashboard</a> or try using the search bar above.
+        </p>
+    </div>
+</div>
+{% endblock %}

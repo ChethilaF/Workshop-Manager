@@ -1,15 +1,67 @@
 {% extends "layout.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
 
 {% block content %}
 <h2>Admin Dashboard</h2>
-<p>Welcome, {{ current_user.username }}!
-You have administrative privileges.</p>
-<p>Here you can manage the system settings, users, and other administrative tasks.</p>
-</p>
-<ul>
-    <li><a href="{{ url_for('main.staff_dashboard') }}">Staff Dashboard</a></li>
-    <li><a href="{{ url_for('main.jobs') }}">Manage Jobs</a></li>
-    <li><a href="{{ url_for('main.customers') }}">Manage Customers</a></li>
-    <li><a href="{{ url_for('main.download_pdf', filename='example.pdf') }}">PDFs</a></li>
-</ul>
+
+<div class="dashboard-container">
+    <p class="welcome-text">
+        Welcome, {{ current_user.username }}! <br>
+        You have administrative privileges.
+    </p>
+
+    <div class="dashboard-grid">
+
+        <!-- Staff Management card -->
+        <a href="{{ url_for('main.staff_dashboard') }}" 
+           class="dashboard-card" 
+           aria-label="Go to Staff Management section">
+            <i class="fas fa-users-cog"></i>
+            <h3>Staff Management</h3>
+            <p>View and manage staff users</p>
+        </a>
+
+        <!-- Jobs card -->
+        <a href="{{ url_for('main.jobs') }}" 
+           class="dashboard-card" 
+           aria-label="Go to Jobs section">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Jobs</h3>
+            <p>Assign, edit, and track jobs</p>
+        </a>
+
+        <!-- Customers card -->
+        <a href="{{ url_for('main.customers') }}" 
+           class="dashboard-card" 
+           aria-label="Go to Customers section">
+            <i class="fas fa-user-friends"></i>
+            <h3>Customers</h3>
+            <p>Manage customer profiles</p>
+        </a>
+
+        <!-- Weekly Summary PDFs card -->
+        <a href="{{ url_for('main.weekly_summary_dashboard') }}" 
+           class="dashboard-card" 
+           aria-label="Go to Weekly Summary PDFs section">
+            <i class="fas fa-file-pdf"></i>
+            <h3>Weekly Summary PDFs</h3>
+            <p>Generate and download weekly summaries</p>
+        </a>
+
+        <!-- Live Jobs card -->
+        <a href="{{ url_for('main.live_jobs') }}" 
+           class="dashboard-card" 
+           aria-label="Go to Live Jobs section">
+            <i class="fas fa-bolt"></i>
+            <h3>Live Jobs</h3>
+            <p>Monitor and manage live jobs</p>
+        </a>
+
+    </div>
+</div>
 {% endblock %}

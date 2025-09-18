@@ -3,34 +3,56 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='edit_customer.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/customer_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="customer-form-container">
-  <a href="{{ url_for('main.customers') }}" class="back-button">
-    <i class="fas fa-arrow-left"></i> Back
-  </a>
+<h2>Edit Customer</h2>
 
-  <h2>Edit Customer</h2>
-  <form method="POST">
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" name="name" value="{{ customer.name }}" placeholder="Full name" required>
-    </div>
-    <div class="input-group">
-      <i class="fas fa-envelope"></i>
-      <input type="email" name="email" value="{{ customer.email }}" placeholder="Email (optional)">
-    </div>
-    <div class="input-group">
-      <i class="fas fa-phone"></i>
-      <input type="text" name="phone" value="{{ customer.phone }}" placeholder="Phone" required>
-    </div>
-    <div class="input-group">
-      <i class="fas fa-map-marker-alt"></i>
-      <input type="text" name="address" value="{{ customer.address }}" placeholder="Address (optional)">
-    </div>
-    <button type="submit" class="btn-submit">Update Customer</button>
-  </form>
+<div class="body-content">
+  <div class="customer-form-container">
+    <!-- Back button -->
+    <a href="{{ url_for('main.customers') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Edit Customer form -->
+     
+    <form method="POST">
+      <!-- Name -->
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <label for="name" class="visually-hidden">Full Name</label>
+        <input type="text" id="name" name="name" value="{{ customer.name }}" placeholder="Full name" required aria-required="true">
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <label for="email" class="visually-hidden">Email (optional)</label>
+        <input type="email" id="email" name="email" value="{{ customer.email }}" placeholder="Email (optional)" aria-label="Email (optional)">
+      </div>
+
+      <!-- Phone -->
+      <div class="input-group">
+        <i class="fas fa-phone"></i>
+        <label for="phone" class="visually-hidden">Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ customer.phone }}" placeholder="Phone" 
+               required aria-required="true"
+               pattern="^[0-9\-\+\s\(\)]{7,20}$"
+               title="Enter a valid phone number (digits, spaces, +, -, parentheses)">
+      </div>
+
+      <!-- Address -->
+      <div class="input-group">
+        <i class="fas fa-map-marker-alt"></i>
+        <label for="address" class="visually-hidden">Address (optional)</label>
+        <input type="text" id="address" name="address" value="{{ customer.address }}" placeholder="Address (optional)" aria-label="Address (optional)">
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="submit-button">Update Customer</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

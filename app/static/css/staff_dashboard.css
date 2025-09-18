@@ -1,0 +1,142 @@
+/* ===============================
+   Staff Dashboard Styles
+   =============================== */
+
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 2rem; /* large padding, could shrink for small screens */
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+/* Technician grid container */
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem auto;
+  padding: 1rem;
+  max-width: 1000px; /* Might be too wide on mobile */
+}
+
+/* Technician circle buttons */
+.tech-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #a02bc3;
+  color: rgb(0, 0, 0);
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 10px #00C8DF;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s ease both; /* nice fade-in effect */
+}
+
+.tech-circle:hover {
+  transform: scale(1.1);
+  background-color: #00ffff; /* bright cyan, may clash with dark theme */
+  box-shadow: 0 0 12px #00ffff, 0 0 24px #9b28b1 inset; /* inset shadow may look busy */
+  animation: hoverEffect 0.5s ease forwards; /* runs on hover */
+}
+
+.tech-circle:active {
+  transform: scale(0.95); /* quick press effect */
+}
+
+.tech-circle span {
+  position: relative;
+  z-index: 1; /* ensures text stays above hover effects */
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .tech-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Notification controls container */
+.notification-controls {
+  margin: 0px 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Notification buttons */
+.notify-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  color: #000000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.notify-btn.enable {
+  background: linear-gradient(135deg, #28a745, #45d66c);
+}
+
+.notify-btn.enable:hover {
+  background: linear-gradient(135deg, #218838, #36b95d);
+  transform: translateY(-2px); /* subtle hover lift */
+}
+
+.notify-btn.disable {
+  background: linear-gradient(135deg, #dc3545, #ff5c6c);
+}
+
+.notify-btn.disable:hover {
+  background: linear-gradient(135deg, #b02a37, #e04656);
+  transform: translateY(-2px);
+}
+
+/* Technician fade-in animation */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: rotateY(180deg) scale(0.95) translateY(20px); /* 3D flip + move */
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Hover effect animation */
+@keyframes hoverEffect {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05); /* small hover pulse */
+  }
+}
+
+/* ===============================
+   Notes / Suggestions
+   =============================== */
+/* 1. .tech-circle hover color is very bright; may want to match dashboard theme. */
+/* 2. Duplicate @media (max-width: 600px) block at the end; can merge with previous one. */
+/* 3. Box-shadow on hover uses inset + normal shadow; may look busy on mobile. */
+/* 4. Consider reducing .tech-grid max-width or padding on mobile for better responsiveness. */

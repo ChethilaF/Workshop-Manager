@@ -3,52 +3,68 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='add_technician.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/technician_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="technician-form-container">
-  <div class="back-link">
-    <a href="{{ url_for('main.technicians') }}"><i class="fas fa-arrow-left"></i> Back</a>
+<h2>Add New Technician</h2>
+
+<div class="body-content">
+  <div class="technician-form-container">
+    <!-- Back button -->
+    <a href="{{ url_for('main.technicians') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Add Technician form -->
+
+    <form method="POST">
+      <!-- Username -->
+      <div class="input-group">
+        <label for="username"><i class="fas fa-user-circle"></i> Username :</label>
+        <input type="text" id="username" name="username" placeholder="Username" required aria-required="true" 
+               pattern="^[a-zA-Z0-9_.-]{3,20}$" title="3–20 characters, letters, numbers, underscores, dots, or hyphens only" autofocus>
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+        <label for="password"><i class="fas fa-lock"></i> Password :</label>
+        <input type="password" id="password" name="password" placeholder="Password" required aria-required="true">
+      </div>
+
+      <!-- Full Name -->
+      <div class="input-group">
+        <label for="name"><i class="fas fa-user"></i> Full Name :</label>
+        <input type="text" id="name" name="name" placeholder="Full Name" required aria-required="true">
+      </div>
+
+      <!-- Phone -->
+      <div class="input-group">
+        <label for="phone"><i class="fas fa-phone"></i> Phone :</label>
+        <input type="text" id="phone" name="phone" placeholder="Phone" 
+               pattern="^[0-9\-\+\s\(\)]{7,20}$" 
+               title="Enter a valid phone number (digits, spaces, +, -, parentheses)">
+      </div>
+
+      <!-- Specialization -->
+      <div class="input-group">
+        <label for="specialization"><i class="fas fa-tools"></i> Specialization :</label>
+        <input type="text" id="specialization" name="specialization" placeholder="Specialization (optional)">
+      </div>
+
+      <!-- Role selection -->
+      <div class="input-group">
+        <label for="role"><i class="fas fa-shield-alt"></i> Role :</label>
+        <select id="role" name="role" required aria-required="true">
+          <option value="" disabled selected>Select Access Level</option>
+          <option value="technician">Technician</option>
+          <option value="viewer">Viewer (Limited Access)</option>
+        </select>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="submit-button">Add Technician</button>
+    </form>
   </div>
-  <h2>Add New Technician</h2>
-  <form method="POST">
-    <div class="input-group">
-      <i class="fas fa-user-circle"></i>
-      <input type="text" name="username" placeholder="Username" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" name="password" placeholder="Password" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" name="name" placeholder="Full Name" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-phone"></i>
-      <input type="text" name="phone" placeholder="Phone">
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-tools"></i>
-      <input type="text" name="specialization" placeholder="Specialization">
-    </div>
-
-    <div class="input-group">
-      <label for="role"><i class="fas fa-shield-alt"></i> Role:</label>
-      <select name="role" required>
-        <option value="" disabled selected>Select Access Level</option>
-        <option value="technician">Technician</option>
-        <option value="viewer">Viewer (Limited)</option>
-      </select>
-    </div>
-
-    <button type="submit" class="btn-submit">Add Technician</button>
-  </form>
-  
 </div>
 {% endblock %}

@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block title %}Shift Dashboard{% endblock %}
+
+{% block extra_css %}
+<!-- Shift Dashboard CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/log_shift.css') }}">
+<!-- Font Awesome icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<h2>Shift Dashboard</h2>
+
+<div class="tech-grid">
+  {% for tech in techs %}
+  <form action="{{ url_for('main.log_shift', tech_id=tech.id) }}" method="get">
+    <button type="submit" class="tech-circle">{{ tech.name }}</button>
+  </form>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("📋 Shift Dashboard loaded");
+  // Additional JS if needed for future enhancements
+});
+</script>
+{% endblock %}

@@ -2,136 +2,187 @@
 {% block title %}Job Control{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='job_control.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/job_control.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="job-control-container">
-  <h2>Job: {{ job.description }}</h2>
+<div class="body-content">
+  <div class="job-control-container">
 
-  <div class="job-info">
-    <p><strong>Vehicle Reg:</strong> {{ job.vehicle_registration }}</p>
-    <p><strong>Status:</strong> {{ job.status }}</p>
-    <p><strong>Timer:</strong> <span id="liveTimer">00:00:00</span></p>
-    <p><strong>Current Time:</strong> <span id="currentTime">Loading...</span></p>
-    <p><strong>Target Duration:</strong> {{ job.target_duration if job.target_duration else '01:30:00' }}</p>
-  </div>
-
-  <input type="hidden" id="jobStart" value="{{ job.start_time.isoformat() if job.start_time else '' }}">
-  <input type="hidden" id="totalWork" value="{{ job.total_work_duration or 0 }}">
-  <input type="hidden" id="jobStatus" value="{{ job.status }}">
-
-  <div class="action-buttons">
-    <form method="POST">
-      <input type="hidden" name="action" value="start">
-      <button type="submit" class="btn-start">Start Job</button>
-    </form>
-
-    <form method="POST" onsubmit="stopTimer();">
-      <input type="hidden" name="action" value="pause">
-      <div id="pauseReasonBox" style="display:none;">
-        <label>Reason for pause:</label>
-        <input type="text" name="pause_reason" placeholder="Enter reason" required>
+    <!-- Job Info -->
+    <div class="job-header">
+      <h2>{{ job.description }}</h2>
+      <div class="vehicle-info">
+        <p><strong>Vehicle:</strong> {{ job.vehicle_make }} {{ job.vehicle_model }}</p>
+        <p><strong>Registration:</strong> {{ job.vehicle_registration }}</p>
+        <p><strong>Customer:</strong> {{ job.customer.name }}</p>
+        <p><strong>Cost:</strong> {{ job.cost }}</p>
+        <p><strong>Status:</strong> <span id="jobStatusLabel">{{ job.status }}</span></p>
       </div>
-      <button type="button" onclick="togglePauseReason()" class="btn-pause">Pause Job</button>
-    </form>
+    </div>
 
-    <form method="POST">
-      <input type="hidden" name="action" value="resume">
-      <button type="submit" class="btn-resume">Resume Job</button>
-    </form>
+    <!-- Timer & Progress -->
+    <div class="timer-section">
+      <div class="timer-box">
+        <p>Elapsed Time</p>
+        <span id="liveTimer">00:00:00</span>
+      </div>
+      <div class="timer-box">
+        <p>Current Time</p>
+        <span id="currentTime">--:--:--</span>
+      </div>
+      <div class="timer-box">
+        <p>Target Duration</p>
+        <span>
+          {% if job.target_duration_seconds %}
+          {% set total_seconds = job.target_duration_seconds %}
+          {% set days = total_seconds // 86400 %}
+          {% set hours = (total_seconds % 86400) // 3600 %}
+          {% set minutes = (total_seconds % 3600) // 60 %}
+          {{ days }}d {{ hours }}h {{ minutes }}m
+          {% else %}
+          1d 1h 30m
+          {% endif %}
+        </span>
+      </div>
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
 
-    <form method="POST">
-      <input type="hidden" name="action" value="stop">
-      <button type="submit" class="btn-stop">Stop Job</button>
-    </form>
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <!-- START JOB -->
+      <form action="{{ url_for('main.start_job', job_id=job.id) }}" method="POST">
+        <button id="startButton" class="action-button start-button" 
+          {% if job.status in ['Running','In Progress'] %}disabled{% endif %}>
+          <i class="fa fa-play"></i> Start Job
+        </button>
+      </form>
+
+      <!-- PAUSE -->
+      <div class="pause-container">
+        <form action="{{ url_for('main.pause_job', job_id=job.id) }}" method="POST">
+          <button type="button" class="action-button pause-button" onclick="togglePauseBox()">Pause Job</button>
+          <!-- Hidden reason box -->
+          <div id="pauseReasonBox" class="pause-reason-box">
+            <input type="text" name="reason" placeholder="Enter reason" required>
+            <button type="submit" class="btn-confirm-pause">Confirm Pause</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- RESUME JOB -->
+      <form action="{{ url_for('main.resume_job', job_id=job.id) }}" method="POST">
+        <button id="resumeButton" class="action-button resume-button">
+          <i class="fa fa-play-circle"></i> Resume Job
+        </button>
+      </form>
+
+      <!-- STOP JOB -->
+      <form action="{{ url_for('main.stop_job', job_id=job.id) }}" method="POST">
+        <button id="stopButton" class="action-button stop-button">
+          <i class="fa fa-stop-circle"></i> Stop Job
+        </button>
+      </form>
+    </div>
+
+    <!-- Pause / Resume History -->
+    <div class="history-section">
+      <h3>Pause / Resume History</h3>
+      {% if job.pauses %}
+      <ul class="history-list">
+        {% for p in job.pauses %}
+        <li>
+          <strong>Paused:</strong> {{ p.paused_at }} |
+          <strong>Timer:</strong> {{ "%02d:%02d:%02d"|format(p.timer_value // 3600, (p.timer_value % 3600)//60, p.timer_value % 60) }} |
+          <strong>Resumed:</strong> {{ p.resumed_at if p.resumed_at else 'Not resumed yet' }} |
+          <strong>Reason:</strong> {{ p.reason }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No pauses recorded.</p>
+      {% endif %}
+    </div>
+
   </div>
-
-  <h3 class="pause-history-title">Pause History:</h3>
-  {% if job.pauses %}
-  <ul class="pause-list">
-    {% for p in job.pauses %}
-    <li>
-      <strong>Paused:</strong> {{ p.paused_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
-      <strong>Resumed:</strong> {{ p.resumed_at.strftime('%Y-%m-%d %H:%M:%S') if p.resumed_at else 'Not resumed yet' }}<br>
-      <strong>Reason:</strong> {{ p.reason }}
-    </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>No pauses recorded.</p>
-  {% endif %}
 </div>
 
+<!-- Hidden inputs for JS -->
+<input type="hidden" id="initialElapsed" value="{{ job.total_work_duration or 0 }}">
+<input type="hidden" id="targetSeconds" value="{{ job.target_duration_seconds or 5400 }}">
+<input type="hidden" id="jobStartTime" value="{{ job.start_time | tojson }}">
+
 <script>
-  function formatTime(seconds) {
-    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  }
+// Job Control JS
+let elapsedSeconds = parseInt(document.getElementById('initialElapsed').value);
+const targetSeconds = parseInt(document.getElementById('targetSeconds').value);
+const liveTimer = document.getElementById('liveTimer');
+const progressBar = document.getElementById('progressBar');
+const jobStatusLabel = document.getElementById('jobStatusLabel');
+const startButton = document.getElementById('startButton');
+const jobStartStr = document.getElementById('jobStartTime').value;
+let jobStart = jobStartStr ? new Date(jobStartStr) : null;
+let timerInterval = null;
 
-  function startLiveTimer() {
-    const startStr = document.getElementById('jobStart').value;
-    const extra = parseInt(document.getElementById('totalWork').value || '0');
-    const status = document.getElementById('jobStatus').value;
-    const timerSpan = document.getElementById('liveTimer');
-    const nowSpan = document.getElementById('currentTime');
-    if (!startStr || status === 'Paused') return;
-
-    const startTime = new Date(startStr + "Z");
-
-    if (isNaN(startTime.getTime())) {
-      timerSpan.innerText = "Invalid start time";
-      return;
-    }
-
-    setInterval(() => {
-      const now = new Date();
-      nowSpan.innerText = now.toLocaleTimeString();
-      const diff = Math.floor((now.getTime() - startTime.getTime()) / 1000) + extra;
-      timerSpan.innerText = formatTime(Math.max(0, diff));
-    }, 1000);
-  }
-
-  startLiveTimer();
-</script>
-
-<!-- Push Notification Subscription -->
-<script>
-const publicVapidKey = "{{ vapid_public_key }}";
-
-async function registerPush() {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        try {
-            const register = await navigator.serviceWorker.register('/static/js/service-worker.js');
-
-            const subscription = await register.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-            });
-
-            await fetch('{{ url_for("main.save_subscription") }}', {
-                method: 'POST',
-                body: JSON.stringify(subscription),
-                headers: { 'Content-Type': 'application/json' }
-            });
-        } catch (error) {
-            console.error("Push subscription failed:", error);
-        }
-    }
+// Format seconds as HH:MM:SS or d:h:m:s
+function formatTime(seconds) {
+    const d = Math.floor(seconds / 86400);
+    const h = Math.floor((seconds % 86400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if(d>0) return `${d}d ${h}h ${m}m ${s}s`;
+    if(h>0) return `${h}h ${m}m ${s}s`;
+    return `${m}m ${s}s`;
 }
 
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-    const rawData = atob(base64);
-    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+// Update timer and progress bar
+function updateTimer() {
+    let total = elapsedSeconds;
+    if(jobStart){
+        total += Math.floor((new Date() - jobStart)/1000);
+    }
+    liveTimer.innerText = formatTime(total);
+    let percent = Math.min(100, (total / targetSeconds)*100);
+    progressBar.style.width = percent + '%';
+    progressBar.style.backgroundColor = total > targetSeconds ? 'red':'#00c8df';
 }
 
-registerPush();
-</script>
+// Start timer
+function startTimer(){
+    if(timerInterval) return;
+    if(!jobStart) jobStart = new Date();
+    startButton.disabled = true;
+    jobStatusLabel.innerText = 'Running';
+    timerInterval = setInterval(updateTimer, 1000);
+}
 
+// Stop timer
+function stopTimer(){
+    clearInterval(timerInterval);
+    jobStatusLabel.innerText = 'Waiting for Approval';
+    window.location.href = "{{ url_for('main.staff_dashboard') }}"; // Redirect after stop
+}
+
+// Pause reason box toggle
+function togglePauseBox(){
+    const box = document.getElementById('pauseReasonBox');
+    box.style.display = box.style.display==='none' ? 'block':'none';
+}
+
+// Initialize current time
+const currentTimeSpan = document.getElementById('currentTime');
+setInterval(()=>{
+    currentTimeSpan.innerText = new Date().toLocaleTimeString();
+},1000);
+
+// Auto start timer if already running
+if(["Running","In Progress"].includes("{{ job.status }}")){
+    startTimer();
+}
+
+// Initial update
+updateTimer();
+</script>
 {% endblock %}

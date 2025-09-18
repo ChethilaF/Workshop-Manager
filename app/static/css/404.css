@@ -1,0 +1,35 @@
+/* -------------------------------404 Error Page Styles---------------------- */
+
+/* -------------Body Content------------- */
+.body-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ------Container for the error message and link------ */
+.error-container {
+  text-align: center;
+  margin-top: 100px;
+  font-family: Arial, sans-serif;
+}
+
+/* -----------Large error code 404----------- */
+.error-container h1 {
+  font-size: 100px;
+  color: #ff4d4d;
+}
+
+/* ------Sub-message text under the error code------ */
+.error-container p {
+  font-size: 20px;
+  margin: 20px 0;
+}
+
+.error-container a {
+  text-decoration: none;
+  background: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+}

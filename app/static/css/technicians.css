@@ -1,0 +1,163 @@
+h2 {
+  text-align: center;
+  margin: 0;
+  padding: 2rem;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+/* Action bar */
+.action-bar {
+  text-align: right;
+  margin: 0 15px 20px;
+}
+
+/* Add Technician button */
+.btn-add {
+  background-color: #9424a3;
+  color: #000;
+  padding: 10px 15px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+.btn-add:hover {
+  background-color: #00C8DF;
+  color: #000;
+}
+
+/* Technician list container */
+.technician-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  list-style-type: none;
+  padding: 0;
+  margin: 0 15px 20px 15px;
+  gap: 15px;
+}
+@media (max-width: 600px) {
+  .technician-list {
+    padding: 0 15px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Each technician item */
+.technician-item {
+  background-color: rgb(0, 0, 0);
+  box-shadow: 0 2px 6px #00C8DF;
+  border-radius: 40px;
+  width: calc(100% - 100px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.technician-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(155, 40, 177, 0.6);
+}
+@media (max-width: 600px) {
+  .technician-item {
+    flex-direction: column;
+    width: 100%;
+    padding: 20px 10px 10px 20px;
+  }
+}
+
+/* ===============================
+   Technician Info Text
+   =============================== */
+.technician-info span {
+  font-size: 22px;
+  padding: 5px;
+}
+
+.technician-info small {
+  font-size: 18px;
+  color: #ffffff;
+  padding: 5px;
+}
+
+/* Actions (edit/delete buttons) */
+.technician-actions {
+  display: flex;
+  padding: 5px;
+  gap: 0;
+}
+
+/* Edit button */
+.edit-button {
+  background-color: #00C8DF;
+  color: rgb(0, 0, 0);
+  padding: 10px;
+  margin-bottom: 5px;
+  border: none;
+  border-top-left-radius: 40px;
+  border-bottom-left-radius: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.delete-button {
+  background-color: #ee0800;
+  color: rgb(0, 0, 0);
+  padding: 10px 10px 11px 10px; /* slightly taller to align visually */
+  margin-bottom: 5px;
+  border: none;
+  border-top-right-radius: 40px;
+  border-bottom-right-radius: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.edit-button i,
+.delete-button i {
+  margin-right: 5px; /* spacing between icon and text */
+}
+
+.edit-button:hover {
+  background-color: #00C8DF;
+  color: #000000;
+}
+
+.delete-button:hover {
+  background-color: #ee0800;
+  color: #000000;
+}
+
+/* ===============================
+   Responsive for mobile
+   =============================== */
+@media (max-width: 600px) {
+  .action-bar {
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .technician-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .edit-button,
+  .delete-button {
+    width: auto;
+    border-radius: 20px;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}

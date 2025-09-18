@@ -1,43 +1,81 @@
-html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <title>Job Summary</title>
   <style>
+    /* Global styling for PDF output */
     body {
-      font-family: Arial;
+      font-family: Arial, sans-serif;
       padding: 20px;
+      color: #333;
     }
 
+    /* Title styling */
     h1 {
-      font-size: 20px;
+      font-size: 22px;
+      margin-bottom: 10px;
+      text-align: center;
+      text-decoration: underline;
     }
 
-    p,
-    li {
+    /* Section headers */
+    h2 {
+      font-size: 18px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    /* General text formatting */
+    p, li {
       font-size: 14px;
       line-height: 1.5;
+      margin: 5px 0;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    /* Job info container */
+    .job-info p {
+      margin: 3px 0;
+    }
+
+    /* Each pause entry */
+    .pause-history li {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 
 <body>
+  <!-- Main title -->
   <h1>Job Summary Report</h1>
-  <p><strong>Technician:</strong> {{ technician.name }}</p>
-  <p><strong>Vehicle Registration:</strong> {{ job.vehicle_registration }}</p>
-  <p><strong>Description:</strong> {{ job.description }}</p>
-  <p><strong>Status:</strong> {{ job.status }}</p>
-  <p><strong>Start Time:</strong> {{ job.start_time.strftime('%Y-%m-%d %H:%M:%S') if job.start_time else 'N/A' }}</p>
-  <p><strong>End Time:</strong> {{ job.end_time.strftime('%Y-%m-%d %H:%M:%S') if job.end_time else 'N/A' }}</p>
-  <p><strong>Total Time Worked:</strong> {{ duration }}</p>
+
+  <!-- Section: Job details -->
+  <div class="job-info">
+    <p><strong>Technician:</strong> {{ technician.name }}</p>
+    <p><strong>Vehicle Registration:</strong> {{ job.vehicle_registration }}</p>
+    <p><strong>Description:</strong> {{ job.description }}</p>
+    <p><strong>Status:</strong> {{ job.status }}</p>
+    <!-- Handle null start/end times safely -->
+    <p><strong>Start Time:</strong> {{ job.start_time.strftime('%Y-%m-%d %H:%M:%S') if job.start_time else 'N/A' }}</p>
+    <p><strong>End Time:</strong> {{ job.end_time.strftime('%Y-%m-%d %H:%M:%S') if job.end_time else 'N/A' }}</p>
+    <p><strong>Total Time Worked:</strong> {{ duration }}</p>
+  </div>
+
+  <!-- Section: Pause history (only shown if data exists) -->
   {% if pauses %}
   <h2>Pause History</h2>
-  <ul>
+  <ul class="pause-history">
     {% for pause in pauses %}
     <li>
       <strong>Paused at:</strong> {{ pause.paused_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
-      {% if pause.resumed_at %}<strong>Resumed at:</strong> {{ pause.resumed_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
-      {% else %}<strong>Resumed at:</strong> (not resumed)<br>{% endif %}
+      <strong>Resumed at:</strong> {{ pause.resumed_at.strftime('%Y-%m-%d %H:%M:%S') if pause.resumed_at else '(not resumed)' }}<br>
       <strong>Reason:</strong> {{ pause.reason or 'N/A' }}
     </li>
     {% endfor %}

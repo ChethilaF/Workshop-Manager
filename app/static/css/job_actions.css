@@ -1,0 +1,170 @@
+/* ===========================
+   Layout - Body
+   =========================== */
+.body-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===========================
+   Job Form Container
+   =========================== */
+.job-form-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 700px; /* restrict form width */
+  padding: 30px;
+  margin: 20px auto;
+  background-color: #000;
+  box-shadow: 0 2px 6px #00C8DF;
+  border-radius: 40px;
+  box-sizing: border-box;
+}
+
+/* ===========================
+   Headings
+   =========================== */
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 2rem;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+@media (max-width: 1380px) {
+  h2 {
+    text-align: center;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    color: rgb(255, 255, 255);
+  }
+}
+
+/* ===========================
+   Input Groups (with icons)
+   =========================== */
+.input-group {
+  display: flex;
+  align-items: center;
+  background-color: #1c1c1c;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Icon inside input group */
+.input-group i {
+  color: #9b28b1;
+  margin-right: 10px;
+  flex-shrink: 0; /* prevent icon from shrinking */
+  width: 24px; /* consistent icon size */
+  text-align: center;
+}
+
+/* Inputs and select boxes */
+.input-group input,
+.input-group select {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #9b28b1;
+  color: #fff;
+  flex: 1; /* fill remaining space */
+  padding: 8px;
+  font-size: 16px;
+  min-width: 0; /* fix overflow issue */
+}
+
+/* Ensure purple line doesn't exceed box */
+.input-group input,
+.input-group select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-group select option {
+  background-color: #1c1c1c;
+  color: #fff;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #00C8DF;
+}
+
+.duration-selects {
+  display: flex;
+  gap: 10px;
+}
+.duration-selects select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+
+/* ===========================
+   Buttons
+   =========================== */
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #9b28b1;
+  color: #000;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #00C8DF;
+  color: #000;
+}
+
+/* Back Button */
+.back-button {
+  color: #9b28b1;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.back-button:hover {
+  text-decoration: none;
+  color: #00C8DF;
+}
+
+/* ===========================
+   Responsive for Mobile
+   =========================== */
+@media (max-width: 768px) {
+  .job-form-container {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .input-group i {
+    margin-bottom: 5px;
+    margin-right: 0;
+    width: auto;
+  }
+
+  .input-group input,
+  .input-group select {
+    width: 100%;
+  }
+}

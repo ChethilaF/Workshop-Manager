@@ -1,106 +1,122 @@
 {% extends "layout.html" %}
-
 {% block title %}Add Job{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='add_job.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/job_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="job-form-container">
-  <div class="back-link">
-    <a href="{{ url_for('main.jobs') }}"><i class="fas fa-arrow-left"></i> Back</a>
+<h2>Add New Job</h2>
+
+<div class="body-content">
+  <div class="job-form-container">
+    <a href="{{ url_for('main.jobs') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <form method="POST">
+      <!-- Job description -->
+      <div class="input-group">
+        <label for="description"><i class="fas fa-briefcase"></i> Job Description</label>
+        <input type="text" id="description" name="description" placeholder="Job description" required>
+      </div>
+
+      <!-- Start & End Date -->
+      <div class="input-group">
+        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
+        <input type="date" id="start_date" name="start_date">
+      </div>
+      <div class="input-group">
+        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
+        <input type="date" id="end_date" name="end_date">
+      </div>
+
+      <!-- Target duration -->
+      <div class="input-group">
+        <label><i class="fas fa-clock"></i> Target Duration:</label>
+        <div class="duration-selects">
+          <select name="target_hours">
+            {% for h in range(0, 13) %}
+            <option value="{{ h }}" {% if job and target_hours==h %}selected{% endif %}>
+              {{ h }} hr{% if h != 1 %}s{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+          <select name="target_minutes">
+            {% for m in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] %}
+            <option value="{{ m }}" {% if job and target_minutes==m %}selected{% endif %}>
+              {{ m }} min
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="input-group">
+        <label for="status"><i class="fas fa-tasks"></i> Status:</label>
+        <select id="status" name="status">
+          <option value="Pending" selected>Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+
+      <!-- Customer & Technician -->
+      <div class="input-group">
+        <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
+        <select id="customer_id" name="customer_id">
+          {% for customer in customers %}
+          <option value="{{ customer.id }}">{{ customer.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
+        <select id="technician_id" name="technician_id">
+          {% for tech in technicians %}
+          <option value="{{ tech.id }}">{{ tech.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Vehicle Details -->
+      <div class="input-group">
+        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration:</label>
+        <input type="text" id="vehicle_registration" name="vehicle_registration">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make:</label>
+        <input type="text" id="vehicle_make" name="vehicle_make">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_model"><i class="fas fa-car"></i> Vehicle Model:</label>
+        <input type="text" id="vehicle_model" name="vehicle_model">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year:</label>
+        <input type="number" id="vehicle_year" name="vehicle_year">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color:</label>
+        <input type="text" id="vehicle_color" name="vehicle_color">
+      </div>
+
+      <!-- Cost -->
+      <div class="input-group">
+        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost:</label>
+        <input type="number" id="total_cost" name="total_cost" step="0.01">
+      </div>
+
+      <!-- Notes -->
+      <div class="input-group">
+        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes:</label>
+        <textarea id="notes" name="notes"></textarea>
+      </div>
+
+      <button type="submit" class="submit-button">Add Job</button>
+    </form>
   </div>
-  <h2>Add New Job</h2>
-  <form method="POST">
-    <div class="input-group">
-      <i class="fas fa-briefcase"></i>
-      <input type="text" name="description" placeholder="Job description" required>
-    </div>
-
-    <div class="input-group">
-      <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
-      <input type="date" name="start_date">
-    </div>
-
-    <div class="input-group">
-      <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
-      <input type="date" name="end_date">
-    </div>
-
-    <label>Target Duration (minutes):</label>
-    <input type="number" name="target_duration" min="1" placeholder="90">
-
-    <div class="input-group">
-      <label for="status"><i class="fas fa-tasks"></i> Status:</label>
-      <select name="status">
-        <option value="Pending">Pending</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Completed">Completed</option>
-      </select>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-dollar-sign"></i>
-      <input type="number" name="total_cost" step="0.01" placeholder="Total Cost ($)">
-    </div>
-
-    <div class="input-group">
-      <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
-      <select name="customer_id">
-        {% for customer in customers %}
-        <option value="{{ customer.id }}">{{ customer.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="input-group">
-      <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
-      <select name="technician_id">
-        {% for tech in technicians %}
-        <option value="{{ tech.id }}">{{ tech.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-car"></i>
-      <input type="text" name="vehicle_registration" placeholder="Vehicle Registration (e.g. ABC123)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-car-side"></i>
-      <input type="text" name="vehicle_make" placeholder="Vehicle Make (e.g. Toyota)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-car"></i>
-      <input type="text" name="vehicle_model" placeholder="Vehicle Model (e.g. Camry)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-calendar"></i>
-      <input type="text" name="vehicle_year" placeholder="Vehicle Year (e.g. 2020)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-paint-brush"></i>
-      <input type="text" name="vehicle_color" placeholder="Vehicle Color (e.g. Red)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-dollar-sign"></i>
-      <input type="text" name="total_cost" placeholder="Total Cost ($)" required>
-    </div>
-
-    <div class="input-group">
-      <i class="fas fa-info-circle"></i>
-      <textarea name="notes" placeholder="Additional Notes (optional)"></textarea>
-    </div>
-
-    <button type="submit" class="btn-submit">Add Job</button>
-  </form>
-  
 </div>
 {% endblock %}

@@ -1,0 +1,197 @@
+/* ===============================
+   Job Control Page Styles
+   =============================== */
+
+.body-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.job-control-container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 25px;
+  background-color: #000000;
+  border-radius: 16px;
+  color: #fff;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Job Header */
+.job-header h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.vehicle-info p {
+  margin: 4px 0;
+}
+
+/* Timer Boxes */
+.timer-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.timer-box {
+  flex: 1 1 30%;
+  padding: 12px;
+  background-color: #000;
+  box-shadow: 0 2px 6px #00C8DF;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.timer-box p {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 16px;
+  background-color: #000;
+  box-shadow: 0 2px 6px #00C8DF;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: #00c8df;
+  transition: width 0.5s, background 0.5s;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.action-button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+
+.start-button {
+  background: #9424a3;
+  color: #fff;
+}
+
+.start-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pause-button {
+  background: #9424a3;
+  color: #fff;
+}
+
+.resume-button {
+  background: #9424a3;
+  color: #fff;
+}
+
+.stop-button {
+  background: red;
+  color: #fff;
+}
+
+.action-button:hover {
+  background: #00c8df;
+  color: #000;
+}
+
+/* Pause Reason Box */
+.pause-container {
+  position: relative;
+  display: inline-block;
+  width: auto;
+}
+
+#pauseReasonBox {
+  margin-top: 6px;
+  padding: 8px;
+  background-color: #000000;
+  border-radius: 8px;
+  width: fit-content;
+  display: none;
+}
+
+#pauseReasonBox input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: none;
+  margin-right: 6px;
+}
+
+.btn-confirm-pause {
+  margin: 5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #9424a3;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-confirm-pause:hover {
+  background-color: #00c8df;
+  color: black;
+}
+
+/* History Section */
+.history-section {
+  margin-top: 25px;
+}
+
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+
+.history-list li {
+  background: #222;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+/* Responsive */
+@media screen and (max-width:768px) {
+  .timer-box {
+    flex: 1 1 45%;
+    font-size: 14px;
+  }
+
+  .progress-bar-container {
+    height: 12px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pause-reason-box input {
+    width: 100%;
+  }
+}

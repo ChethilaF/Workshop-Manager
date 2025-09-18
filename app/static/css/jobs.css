@@ -1,0 +1,245 @@
+/* -----------------------------------------------Jobs Page Styles--------------------------------- */
+
+/* -------------Body Content and Heading------------- */
+.body-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 2rem;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+/* -------------------Add Job Button------------------- */
+.add-job-btn {
+  background-color: #9424a3;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 40px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.add-job-btn:hover {
+  background-color: #00C8DF;
+  color: #000;
+}
+
+.action-bar {
+  text-align: right;
+  margin: 0 2rem 1rem 2rem;
+}
+
+/* ---------------------Jobs Grid--------------------- */
+.job-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  padding: 0 2rem;
+}
+
+/* ----------------------Job Card --------------------- */
+.job-card {
+  background-color: #000000;
+  border-radius: 40px;
+  padding: 25px 20px;
+  box-shadow: 0 3px 10px #00C8DF;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(155, 40, 177, 0.6);
+  border-color: #9b28b1;
+}
+
+/* ----------------------Job description------------------- */
+.job-description {
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+/* -------------------Job details--------------------- */
+.job-details p {
+  margin: 8px 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+}
+
+.job-details i {
+  margin-right: 8px;
+  color: #00C8DF;
+}
+
+/* -----------------------Status styles---------------------- */
+.status.pending {
+  background: #686868;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status.in-progress {
+  background: #0178ff;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status.completed {
+  background: #2ecc71;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status.paused {
+  background: #ee9608;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.status.waiting_for_approval {
+  background: #f0d807;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+/* ------------------------Action Buttons-------------------- */
+.job-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.top-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.edit-btn {
+  background-color: #00C8DF;
+  color: rgb(0, 0, 0);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  padding: 8px 20px 8px 25px;
+  margin-right: 0px;
+  border: none;
+  border-radius: 40px 0 0 40px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn {
+  background-color: #ee0800;
+  color: rgb(0, 0, 0);
+    padding: 9px 28px 10px 19px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0 40px 40px 0;
+  margin-left: 0px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.edit-btn i,
+.delete-btn i {
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+.edit-btn:hover {
+  background-color: #00C8DF;
+}
+
+.delete-btn:hover {
+  background-color: #ee0800;
+}
+
+.bottom-button .approval-btn {
+  background-color: #2ecc71;
+  color: #000000;
+  border-radius: 40px;
+  padding: 10px 28px 10px 28px;
+  font-weight: bold;
+  text-decoration: none;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-button .approval-btn i {
+  margin-right: 8px;
+}
+
+.bottom-button .approval-btn:hover {
+  background-color: #00C8DF;
+  color: #000;
+}
+
+/* ---------------Mobile-Specific Button Adjustments--------------- */
+@media (max-width: 600px) {
+  .job-grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+
+  .action-bar {
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  .job-actions {
+    flex-direction: column;
+  }
+
+  .top-buttons {
+    flex-direction: column;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    border-radius: 40px;
+    margin-bottom: 8px;
+  }
+
+  .bottom-button .approval-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

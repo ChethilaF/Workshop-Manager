@@ -1,28 +1,47 @@
 {% extends "layout.html" %}
+
 {% block title %}Jobs Waiting Approval{% endblock %}
 
+{% block extra_css %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Page-specific CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/waiting_approval.css') }}">
+{% endblock %}
+
 {% block content %}
+<!-- Container for jobs waiting approval -->
 <div class="approval-jobs">
+  <!-- Page heading -->
   <h2>Jobs Waiting for Approval</h2>
+
+  <!-- Check if there are jobs to approve -->
   {% if jobs %}
     <ul class="approval-list">
       {% for job in jobs %}
       <li class="approval-item">
+        <!-- Display job details -->
         <strong>{{ job.description }}</strong><br>
         Vehicle: {{ job.vehicle_registration }}<br>
         Technician: {{ job.technician.name }}<br>
         Customer: {{ job.customer.name }}<br>
         Duration: {{ job.total_work_duration }} seconds<br>
+
+        <!-- Approve job button -->
         <form method="POST" action="{{ url_for('main.approve_job', job_id=job.id) }}" style="display:inline-block">
           <button type="submit" class="btn-confirm">Confirm Job</button>
         </form>
+
+        <!-- Retry job button -->
         <form method="POST" action="{{ url_for('main.retry_job', job_id=job.id) }}" style="display:inline-block">
           <button type="submit" class="btn-retry">Retry Job</button>
         </form>
       </li>
       {% endfor %}
     </ul>
+
   {% else %}
+    <!-- Message when no jobs are waiting -->
     <p>No jobs waiting for approval.</p>
   {% endif %}
 </div>

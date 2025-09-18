@@ -2,109 +2,149 @@ from app import db
 from flask_login import UserMixin
 from app import login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
+# User loader for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ==========================
+# User Model
+# ==========================
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128), nullable=False)
-    role = db.Column(db.String(50), nullable=False)
-    active = db.Column(db.Boolean, default=True)
+    username = db.Column(db.String(150), unique=True, nullable=False)
+    email = db.Column(db.String(150), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default='technician')  # roles: admin, technician, finance, reception
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Password hashing methods
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    @property
-    def is_active(self):
-        return self.active
-
-class Customer(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), default='Not Provided')
-    phone = db.Column(db.String(20), nullable=False)
-    address = db.Column(db.String(200), default='Not Provided')
-    jobs = db.relationship('Job', back_populates='customer', cascade="all, delete-orphan")
-
-class Technician(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    phone = db.Column(db.String(20))
-    specialization = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, unique=True, nullable=False)
-    jobs = db.relationship('Job', back_populates='technician', cascade="all, delete-orphan")
-
-class JobsDone(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    job_id = db.Column(db.Integer)
-    description = db.Column(db.String(255))
-    start_time = db.Column(db.DateTime)
-    end_time = db.Column(db.DateTime)
-    total_work_duration = db.Column(db.Integer)
-    vehicle_registration = db.Column(db.String(50))
-    vehicle_model = db.Column(db.String(100))
-    vehicle_year = db.Column(db.String(4))
-    vehicle_color = db.Column(db.String(50))
-    total_cost = db.Column(db.Numeric(10, 2), default=0.00)
-    customer_name = db.Column(db.String(100))
-    technician_name = db.Column(db.String(100))
-    pause_summary = db.Column(db.Text)
+    # Relationship with Technician (if user is technician)
+    technician = db.relationship('Technician', backref='user', uselist=False)
 
     def __repr__(self):
-        return f"<JobsDone {self.job_id} by {self.technician_name}>"
-        
+        return f"<User {self.username} - Role: {self.role}>"
+
+# ==========================
+# Technician Model
+# ==========================
+class Technician(db.Model):
+    __tablename__ = 'technician'
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(150), nullable=False)
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(150))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # link to User table
+    jobs = db.relationship('Job', backref='technician', lazy=True)
+
+    def __repr__(self):
+        return f"<Technician {self.full_name}>"
+
+# ==========================
+# Customer Model
+# ==========================
+class Customer(db.Model):
+    __tablename__ = 'customer'
+    id = db.Column(db.Integer, primary_key=True)
+    full_name = db.Column(db.String(150), nullable=False)
+    phone = db.Column(db.String(50))
+    email = db.Column(db.String(150))
+    vehicle_reg = db.Column(db.String(50), nullable=False)
+    jobs = db.relationship('Job', backref='customer', lazy=True)
+
+    def __repr__(self):
+        return f"<Customer {self.full_name} - {self.vehicle_reg}>"
+
+# ==========================
+# Job Model
+# ==========================
 class Job(db.Model):
     __tablename__ = 'job'
     id = db.Column(db.Integer, primary_key=True)
-    vehicle_registration = db.Column(db.String(20))
-    description = db.Column(db.Text, nullable=False)
-    start_date = db.Column(db.Date)
-    end_date = db.Column(db.Date)
-    status = db.Column(db.String(50), default='Pending')
-    total_cost = db.Column(db.Numeric(10, 2), default=0.00)
-    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
-    technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text)
+    status = db.Column(db.String(50), default='pending')  # pending, accepted, in_progress, paused, completed
+    assigned_technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'))
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
-    total_work_duration = db.Column(db.Integer, default=0)
-    target_duration = db.Column(db.String(20), default='00:00:00')
-    pauses = db.relationship('PauseLog', backref='job', cascade="all, delete-orphan")
-    pause_reason = db.Column(db.Text)
-    paused_at = db.Column(db.DateTime)
-    resume_at = db.Column(db.DateTime)
-    accepted = db.Column(db.Boolean, default=False)
-    customer = db.relationship('Customer', back_populates='jobs')
-    technician = db.relationship('Technician', back_populates='jobs')
+    pause_logs = db.relationship('PauseLog', backref='job', lazy=True)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def total_worked_time(self):
+        """
+        Calculate total time worked on job excluding pauses.
+        Returns timedelta.
+        """
+        if not self.start_time or not self.end_time:
+            return None
+
+        total_pause = sum((pause.duration() for pause in self.pause_logs if pause.duration()), datetime.min - datetime.min)
+        total_time = self.end_time - self.start_time - total_pause
+        return total_time
+
+    def __repr__(self):
+        return f"<Job {self.title} - Status: {self.status}>"
+
+# ==========================
+# Pause Log Model
+# ==========================
 class PauseLog(db.Model):
+    __tablename__ = 'pause_log'
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
-    paused_at = db.Column(db.DateTime, nullable=False)
-    resumed_at = db.Column(db.DateTime)
-    reason = db.Column(db.Text)
+    pause_start = db.Column(db.DateTime, default=datetime.utcnow)
+    pause_end = db.Column(db.DateTime)
 
-class ShiftLog(db.Model):
+    def duration(self):
+        if self.pause_end:
+            return self.pause_end - self.pause_start
+        return None
+
+    def __repr__(self):
+        return f"<PauseLog Job {self.job_id} - {self.pause_start} to {self.pause_end}>"
+
+# ==========================
+# Shift Model (optional)
+# ==========================
+class Shift(db.Model):
+    __tablename__ = 'shift'
     id = db.Column(db.Integer, primary_key=True)
     technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'))
-    date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time)
-    end_time = db.Column(db.Time)
+    start_time = db.Column(db.DateTime, default=datetime.utcnow)
+    end_time = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
 
-    technician = db.relationship('Technician', backref='shifts')
+    def duration(self):
+        if self.end_time:
+            return self.end_time - self.start_time
+        return None
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    def __repr__(self):
+        return f"<Shift Technician {self.technician_id} - {self.start_time} to {self.end_time}>"
 
-
-class PushSubscription(db.Model):
+# ==========================
+# Notification Model (optional)
+# ==========================
+class Notification(db.Model):
+    __tablename__ = 'notification'
     id = db.Column(db.Integer, primary_key=True)
-    technician_id = db.Column(db.Integer, db.ForeignKey('technician.id'), nullable=False)
-    endpoint = db.Column(db.String(500), nullable=False)
-    p256dh = db.Column(db.String(255), nullable=False)
-    auth = db.Column(db.String(255), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    title = db.Column(db.String(150))
+    message = db.Column(db.Text)
+    is_read = db.Column(db.Boolean, default=False)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
-    technician = db.relationship('Technician', backref='push_subscriptions')
+    user = db.relationship('User', backref='notifications')
+
+    def __repr__(self):
+        return f"<Notification {self.title} - Read: {self.is_read}>"

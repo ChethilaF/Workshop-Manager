@@ -1,0 +1,203 @@
+/* ===============================
+   Weekly Summary Dashboard - Mozita Automotive
+   =============================== */
+
+/* Page heading */
+h2 {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 2rem;
+  font-size: 2.5rem;
+  color: #fff;
+}
+
+/* Grid container for tech circles */
+/* Technician grid container */
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start; /* prevent circles from stretching to match tallest */
+  gap: 1rem;
+  margin: 2rem auto;
+  padding: 1rem;
+  max-width: 1000px;
+}
+
+
+
+/* Technician circle (default) */
+.tech-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;  /* allows expanded content to stack vertically */
+  align-items: center;     /* centers text horizontally */
+  justify-content: center; /* centers text vertically */
+  text-align: center;      /* ensures multi-line text is centered */
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px #00C8DF;
+  background-color: #a02bc3;
+  color: #000;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;              /* remove any padding that might shift text */
+}
+
+
+
+/* Expanded rectangle */
+.tech-circle.expanded {
+  width: 350px;       /* rectangle width */
+  height: auto;       /* height adapts to content */
+  border-radius: 40px;
+  background-color: #000;
+  flex-direction: column;
+  padding: 15px;
+  justify-content: flex-start;
+  box-shadow: 0 0 15px #00ffff;
+}
+
+@media (max-width: 600px) {
+  .tech-circle {
+    width: 70px;
+    height: 70px; /* small perfect circle */
+    font-size: 0.75rem;
+  }
+
+  .tech-circle.expanded {
+    width: 90%; /* almost full width */
+  }
+}
+
+
+
+.tech-circle.expanded > span {
+    font-size: 1.4rem;
+    color: #ffffff;
+    font-weight: bold;
+    display: block;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: rotateY(180deg) scale(0.95) translateY(20px); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Hover effect (non-expanded) */
+.tech-circle:hover:not(.expanded) {
+  transform: scale(1.1);
+  background-color: #00ffff;
+  box-shadow: 0 0 12px #00ffff, 0 0 24px #9b28b1 inset;
+  animation: hoverEffect 0.5s ease forwards;
+}
+
+/* PDF content inside expanded circle */
+.pdf-content {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* PDF list styling */
+.pdf-content ul {
+    list-style: none;
+    padding: 5px;
+    margin: 0;
+    background-color:#a02bc391;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+
+}
+
+.pdf-content li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem; /* smaller PDF names */
+    font-weight: normal; /* not bold */
+    color: #ffffff; /* text visible on black */
+}
+
+.btn-download {
+    background-color: #00C8DF;
+    color: #000000;
+    font-size: 0.7rem;
+    text-decoration: none;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.btn-generate {
+    background-color: #00c9df;
+    color: #000000;
+    width: 100%;
+    margin-top: 5px;
+    padding: 5px 0;
+    font-size: 0.8rem;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border: none;
+}
+
+.pdf-content p {
+    margin: 0;
+}
+
+.btn-download:hover {
+    background-color: #00ffff;
+    color: #000;
+}
+
+.btn-generate:hover {
+    background-color: #00C8DF;
+    color: #000;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  .pdf-content li {
+    font-size: 0.8rem;
+  }
+
+  .btn-download {
+    font-size: 0.6rem;
+    padding: 3px;
+  }
+
+  .btn-generate {
+    font-size: 1rem;
+    padding: 4px 0;
+  }
+}
+
+
+
+
+/* Technician fade-in animation */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: scale(0.5) }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Hover effect */
+@keyframes hoverEffect {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.25); }
+}
+
+/* Fade-in for PDF list */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translatex(-10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

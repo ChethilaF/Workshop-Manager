@@ -1,11 +1,17 @@
+/* ===============================
+   Global / Main Styles
+   =============================== */
+
 body {
   font-family: 'Raleway', sans-serif;
-  background-color: 	#60196a;
+  background-color: #60196a;
+  /* dark purple */
   color: white;
   margin: 0;
   padding: 0;
 }
 
+/* Top bar wrapper */
 .top-bar-wrapper {
   display: flex;
   align-items: center;
@@ -13,10 +19,12 @@ body {
   padding-top: 10px;
   padding-bottom: 8px;
   padding-left: 240px;
+  /* Might be large on smaller screens */
   padding-right: 8px;
-  background-color: 	#60196a;
+  background-color: #60196a;
 }
 
+/* Top navigation bar */
 .top-nav {
   flex-grow: 1;
   display: flex;
@@ -26,23 +34,24 @@ body {
   padding: 10px 15px;
   height: 65px;
   border-radius: 40px;
-  box-shadow: 0 2px 6px 	#00C8DF;
+  box-shadow: 0 2px 6px #00C8DF;
 }
 
+/* Right side nav links */
 .nav-right ul {
   list-style: none;
   display: flex;
   align-items: center;
-  margin-right: 0px;
   padding-left: 0px;
   margin-left: 90px;
+  /* Could be large for smaller screens */
   margin-right: 60px;
   gap: 50px;
   font-size: 22px;
 }
 
 .nav-right ul li a {
-  color: 	#F9F9F9;
+  color: #F9F9F9;
   font-weight: 600;
   text-decoration: none;
   font-family: Raleway, sans-serif;
@@ -61,15 +70,26 @@ body {
   color: #000000;
 }
 
+/* Responsive nav hide on smaller screens */
+@media (max-width: 1380px) {
+  .top-nav .nav-right {
+    display: none;
+  }
+
+  .nav-right ul {
+    display: none;
+    /* redundant, already hidden */
+  }
+}
+
+/* User profile image */
 .user-profile {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   position: relative;
-  margin-left: auto;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-right: 0px;
+  margin: 0;
+  /* shorthand could be used */
 }
 
 .user-profile img {
@@ -78,27 +98,31 @@ body {
   border-radius: 50%;
   object-fit: cover;
   transition: transform 0.3s ease;
-  margin-left: 0px;
 }
 
 .user-profile img:hover {
   cursor: pointer;
   transform: perspective(6000px) rotateX(20deg) rotateX(-20deg) rotateY(30deg) scale(1.1);
+  /* Looks fancy but maybe excessive */
 }
 
+/* User popup menu */
 .user-popup {
   position: absolute;
   top: 90px;
   right: 10px;
   scale: 1.3;
-  background-color: 	#00C8DF;
+  /* Not standard, use transform: scale(1.3); */
+  background-color: #00C8DF;
   color: #000000;
-  padding: 10px 10px;
+  padding: 5px 10px;
   border-top-right-radius: 30px;
   border-bottom-left-radius: 30px;
   display: none;
   min-width: 150px;
   z-index: 100;
+  box-shadow: 0 60px 60px #000000;
+  /* Shadow may be too strong */
 }
 
 .user-popup p {
@@ -106,15 +130,16 @@ body {
   font-size: 14px;
 }
 
+/* Header logo */
 .header-logo {
   position: absolute;
   top: 8px;
   left: 8px;
   z-index: 1000;
-  background-color:#ffffff;
+  background-color: #ffffff;
   padding: 10px 20px;
   border-radius: 40px;
-  box-shadow: 0 2px 6px 	#00C8DF;
+  box-shadow: 0 2px 6px #00C8DF;
 }
 
 .header-logo img {
@@ -128,115 +153,36 @@ body {
   transition: transform 0.3s ease-in-out;
 }
 
+/* Main content */
 .main-content {
   flex-grow: 1;
-  padding-left: 30px;
-  margin-top: 0px;
-  padding-top: 10px;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin: 8px;
+  padding-top: 0px;
   border-radius: 40px;
-  min-height: calc(100vh - 65px);
+  min-height: calc(100vh - 5px);
   color: rgb(255, 255, 255);
-  background-color:#1A1A1A;
+  background-color: #1A1A1A;
   transition: margin-left 0.3s ease;
   font-family: Raleway, sans-serif;
-
 }
 
 .main-content.shifted {
   margin-left: 10px;
 }
 
-.alerts {
-  margin-bottom: 20px;
-}
-
-.alert {
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-
-.alert.success {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.alert.error {
-  background-color: #f44336;
-  color: white;
-}
-
-.landing {
-    text-align: center;
-    padding: 100px 20px;
-}
-
-.flashes {
-    margin-top: 20px;
-    list-style: none;
-    padding: 0;
-}
-
-.flash.success {
-    color: green;
-}
-
-.flash.danger {
-    color: red;
-}
-
-.flash.info {
-    color: #003366;
-}
-
-
-.alert {
-    padding: 12px 20px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.status {
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-.status.pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
-.status.in-progress {
-  background-color: #cce5ff;
-  color: #004085;
-}
-
-.status.completed {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status.cancelled {
-background-color: #d9534f;
-}
-
-
+/* Hamburger menu (hidden on large screens) */
 .hamburger {
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   width: 30px;
   height: 22px;
   cursor: pointer;
   z-index: 1001;
+  transition: transform 0.3s ease;
 }
 
 .hamburger div {
-  display: block;
   height: 4px;
   width: 100%;
   background: white;
@@ -244,13 +190,6 @@ background-color: #d9534f;
   transition: all 0.3s ease;
 }
 
-/* Hover effect */
-.hamburger:hover div {
-  background-color: #ff69b4;
-  transform: scaleX(1.1);
-}
-
-/* Animate when active (clicked) */
 .hamburger.active div:nth-child(1) {
   transform: rotate(45deg) translate(5px, 5px);
 }
@@ -263,12 +202,18 @@ background-color: #d9534f;
   transform: rotate(-45deg) translate(6px, -6px);
 }
 
-/*end*/
+@media (max-width: 1380px) {
+  .hamburger {
+    display: flex;
+  }
+}
 
+/* Mobile nav */
 .mobile-nav {
   position: fixed;
   top: 0;
   right: -100vw;
+  /* Hidden by default */
   width: 100vw;
   height: 100vh;
   background-color: #0a0a0a;
@@ -276,27 +221,13 @@ background-color: #d9534f;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 60px;
+  padding-top: 140px;
   z-index: 999;
   transition: right 0.3s ease-in-out;
   pointer-events: none;
+  /* Prevent clicks when hidden */
 }
 
-/* Show mobile menu when open */
-.mobile-nav.open {
-  right: 0;
-  pointer-events: all;
-}
-
-/* Logo inside menu */
-.mobile-nav img.logo {
-  width: 180px;
-  margin-bottom: 40px;
-  border-radius: 40px;
-  box-shadow: 0 0 10px #00C8DF;
-}
-
-/* Nav links styling */
 .mobile-nav ul {
   list-style: none;
   padding: 0;
@@ -317,7 +248,7 @@ background-color: #d9534f;
   display: block;
   width: 100%;
   background-color: #9b28b1;
-  color: white;
+  color: rgb(0, 0, 0);
   font-weight: bold;
   text-decoration: none;
   font-size: 20px;
@@ -334,23 +265,108 @@ background-color: #d9534f;
   transform: scale(1.05);
 }
 
-/* Close button */
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 30px;
-  font-size: 36px;
-  color: white;
-  cursor: pointer;
+@media (max-width: 1380px) {
+  .mobile-nav.open {
+    right: 0;
+    pointer-events: all;
+  }
 }
 
-/* Only show hamburger menu in small screens */
-@media (max-width: 900px) {
-  .top-nav .nav-right {
-    display: none;
+/* Flash container */
+.flash-container {
+  position: fixed;
+  top: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  width: auto;
+  max-width: 90%;
+}
+
+@media (max-width: 600px) {
+  .flash-container {
+    top: 190px;
+    width: 80%;
+    padding: 0 10px;
+  }
+}
+
+.flash-message {
+  background-color: #f0f0f0;
+  color: #111;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+  /* needed for the close button */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.flash-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  line-height: 1;
+}
+
+.flash-close:hover {
+  color: #333;
+}
+
+/* Different categories */
+.flash-message.success {
+  background-color: #28a745;
+  color: #000000;
+  box-shadow: 0 0 10px rgba(40, 167, 69, 0.8);
+}
+
+.flash-message.error {
+  background-color: #dc3545;
+  color: #000000;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.8);
+}
+
+.flash-message.warning {
+  background-color: #ffc107;
+  color: #000;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+}
+
+.flash-message.info {
+  background-color: #17a2b8;
+  color: #000000;
+  box-shadow: 0 0 10px rgba(23, 162, 184, 0.8);
+}
+
+/* Fade-in animation */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 
-  .hamburger {
-    display: flex;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

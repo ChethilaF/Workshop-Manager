@@ -2,33 +2,51 @@
 {% block title %}Welcome | Workshop Manager{% endblock %}
 
 {% block extra_css %}
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="home.css" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+
+<!-- Local CSS for home page styling -->
+<link rel="stylesheet" href="home.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
 {% endblock %}
+
 {% block content %}
 
+<!-- Background image container -->
 <background>
   <img src="{{ url_for('static', filename='login_image.png') }}" alt="Background Image" class="background-image">
 </background>
+<!-- TODO: Consider using a div instead of <background>, as <background> is not a standard HTML element -->
 
 <div class="home-container">
   
+  <!-- Logo -->
   <img src="{{ url_for('static', filename='logo.png') }}" alt="Workshop Manager Logo" class="home-logo">
+  
+  <!-- Heading -->
   <h1 class="home-heading">Welcome</h1>
 
-
+  <!-- Login Form -->
   <form method="POST" class="login-form">
-  <div class="form-group">
-    <input type="text" name="username" id="username" , placeholder="Username" required>
-  </div>
+    <div class="form-group">
+      <input type="text" name="username" id="username" placeholder="Username" required>
+      <!-- TODO: Remove extra comma after id attribute -->
+    </div>
 
-  <div class="form-group">
-    <input type="password" name="password" id="password" placeholder="Password" required>
-  </div>
+    <div class="form-group">
+      <input type="password" name="password" id="password" placeholder="Password" required>
+    </div>
 
-  <button type="submit">Sign In</button>
-</form>
+    <button type="submit">Sign In</button>
+  </form>
 </div>
 {% endblock %}
 
+<!-- Suggested improvements / notes:
+1. Replace <background> tag with a standard <div> or use CSS background-image.
+2. Remove duplicate home.css link if not needed.
+3. Add <label> for username and password inputs for accessibility.
+4. Consider adding autofocus on username input for better UX.
+5. Add proper error messages for failed login attempts.
+6. Ensure responsive design on smaller screens.
+-->

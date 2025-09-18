@@ -1,30 +1,67 @@
 {% extends "layout.html" %}
-{% block title %}Log Shift{% endblock %}
+
+{% block title %}Shift Dashboard{% endblock %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='log_shift.css') }}">
+<!-- Log Shift CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/log_shift.css') }}">
 {% endblock %}
+
 {% block content %}
 <div class="log-shift-container">
+
   <h2>Time Logging for {{ technician.name }}</h2>
-  <form method="POST">
+
+  <form method="POST" id="shiftForm">
     {% if not shift %}
+      <!-- No shift yet: start work -->
       <div class="form-section">
-        <label>Start Time:</label>
-        <input type="time" name="start_time" required>
+        <label>Arrival Time:</label>
+        <input type="time" name="start_time" id="startTime" required>
         <button type="submit">Start Work</button>
       </div>
+
     {% elif not shift.end_time %}
+      <!-- Shift in progress: enter departure -->
       <div class="form-section">
-        <p>Start Time: {{ shift.start_time.strftime('%H:%M') }}</p>
-        <label>End Time:</label>
-        <input type="time" name="end_time" required>
+        <label>Arrival Time:</label>
+        <input type="time" value="{{ shift.start_time.strftime('%H:%M') }}" readonly>
+
+        <label>Departure Time:</label>
+        <input type="time" name="end_time" id="endTime" required>
         <button type="submit">End Work</button>
       </div>
+
     {% else %}
+      <!-- Shift completed -->
       <p>Shift complete for today.</p>
-      <p>Start: {{ shift.start_time.strftime('%H:%M') }}, End: {{ shift.end_time.strftime('%H:%M') }}</p>
+      <p>Arrival: {{ shift.start_time.strftime('%H:%M') }}, Departure: {{ shift.end_time.strftime('%H:%M') }}</p>
     {% endif %}
   </form>
-  <a class="back-link" href="{{ url_for('main.staff_dashboard') }}">&larr; Back to Dashboard</a>
+
+  <a class="back-link" href="{{ url_for('main.shift_dashboard') }}">&larr; Back to Shift Dashboard</a>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-fill current time for arrival
+  const startInput = document.getElementById('startTime');
+  if (startInput) {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    startInput.value = `${hours}:${minutes}`;
+  }
+
+  // Auto-redirect after form submission
+  const form = document.getElementById('shiftForm');
+  form.addEventListener('submit', () => {
+    setTimeout(() => {
+      window.location.href = "{{ url_for('main.shift_dashboard') }}";
+    }, 500); // small delay to allow POST request
+  });
+});
+</script>
 {% endblock %}

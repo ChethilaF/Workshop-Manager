@@ -3,30 +3,75 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='edit_technician.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/technician_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="job-form-container">
-  <a href="{{ url_for('main.technicians') }}" class="back-button">
-    <i class="fas fa-arrow-left"></i> Back
-  </a>
+<h2>Edit Technician</h2>
 
-  <h2>Edit Technician</h2>
-  <form method="POST">
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <input type="text" name="name" value="{{ technician.name }}" placeholder="Full Name" required>
-    </div>
-    <div class="input-group">
-      <i class="fas fa-phone"></i>
-      <input type="text" name="phone" value="{{ technician.phone }}" placeholder="Phone">
-    </div>
-    <div class="input-group">
-      <i class="fas fa-tools"></i>
-      <input type="text" name="specialization" value="{{ technician.specialization }}" placeholder="Specialization">
-    </div>
-    <button type="submit" class="btn-submit">Update Technician</button>
-  </form>
+<div class="body-content">
+  <div class="technician-form-container">
+    <!-- Back button -->
+    <a href="{{ url_for('main.technicians') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Edit Technician form -->
+
+    <form method="POST">
+      <!-- Username -->
+      <div class="input-group">
+        <i class="fas fa-user-circle"></i>
+        <label for="username" class="sr-only">Username</label>
+        <input type="text" id="username" name="username" placeholder="Username"
+               value="{{ tech.user.username }}" required>
+      </div>
+
+      <!-- Password -->
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
+      </div>
+
+      <!-- Full Name -->
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <label for="name" class="sr-only">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Full Name"
+               value="{{ tech.name }}" required>
+      </div>
+
+      <!-- Phone -->
+      <div class="input-group">
+        <i class="fas fa-phone"></i>
+        <label for="phone" class="sr-only">Phone</label>
+        <input type="text" id="phone" name="phone" placeholder="Phone"
+               value="{{ tech.phone }}">
+      </div>
+
+      <!-- Specialization -->
+      <div class="input-group">
+        <i class="fas fa-tools"></i>
+        <label for="specialization" class="sr-only">Specialization</label>
+        <input type="text" id="specialization" name="specialization" placeholder="Specialization"
+               value="{{ tech.specialization }}">
+      </div>
+
+      <!-- Role -->
+      <div class="input-group">
+        <label for="role"><i class="fas fa-shield-alt"></i> Role:</label>
+        <select name="role" id="role" required>
+          <option value="" disabled>Select Access Level</option>
+          <option value="technician" {% if tech.user.role == 'technician' %}selected{% endif %}>Technician</option>
+          <option value="viewer" {% if tech.user.role == 'viewer' %}selected{% endif %}>Viewer (Limited)</option>
+        </select>
+      </div>
+      
+      <!-- Submit button -->
+      <button type="submit" class="submit-button">Update Technician</button>
+    </form>
+
+  </div>
 </div>
 {% endblock %}

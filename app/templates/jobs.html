@@ -2,7 +2,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='jobs.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jobs.css') }}">
 {% endblock %}
 
 {% block title %}Jobs{% endblock %}
@@ -11,31 +11,60 @@
 <h2>Job List</h2>
 
 {% if current_user.role == 'admin' %}
-<div class="action-bar">
-  <a href="{{ url_for('main.add_job') }}" class="add-job-btn">
-    <i class="fas fa-user-plus"></i> Add New Job</a>
-</div>
-{% endif %}
-
-<div class="job-grid">
-  {% for job in jobs %}
-  <div class="job-card">
-    <h3>{{ job.description }}</h3>
-    <p><strong>Customer:</strong> {{ job.customer.name }}</p>
-    <p><strong>Technician:</strong> {{ job.technician.name }}</p>
-    <p><strong>Status:</strong> <span class="status {{ job.status|lower|replace(' ', '-') }}">{{ job.status }}</span></p>
-    <p><strong>Start:</strong> {{ job.start_date }}</p>
-    <p><strong>End:</strong> {{ job.end_date }}</p>
-    <p><strong>Cost:</strong> ${{ job.total_cost }}</p>
-    {% if current_user.role == 'admin' %}
-    <div class="job-actions">
-      <a href="{{ url_for('main.edit_job', job_id=job.id) }}" class="edit-btn">Edit</a>
-      <form action="{{ url_for('main.delete_job', job_id=job.id) }}" method="POST" onsubmit="return confirm('Are you sure?')">
-        <button type="submit" class="delete-btn">Delete</button>
-      </form>
-    </div>
-    {% endif %}
+<div class="body_content">
+  <div class="action-bar">
+    <a href="{{ url_for('main.add_job') }}" class="add-job-btn">
+      <i class="fas fa-plus"></i> Add New Job
+    </a>
   </div>
-  {% endfor %}
+  {% endif %}
+
+  <div class="job-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="job-description">{{ job.job_description }}</div>
+
+      <div class="job-details">
+        <p><i class="fas fa-user"></i> Customer - {{ job.customer.name }}</p>
+        <p><i class="fas fa-wrench"></i> Technician - {{ job.technician.name }}</p>
+        <p><i class="fas fa-tasks"></i> Status - <span class="status {{ job.status|lower|replace(' ', '-') }}">{{
+            job.status }}</span></p>
+        <p><i class="fas fa-calendar-alt"></i> Start - {{ job.start_date or 'N/A' }}</p>
+        <p><i class="fas fa-calendar-check"></i> End - {{ job.end_date or 'N/A' }}</p>
+        <p><i class="fas fa-dollar-sign"></i> Cost - ${{ job.total_cost }}</p>
+        <p><i class="fas fa-car"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{ job.vehicle_year }}
+        </p>
+        <p><i class="fas fa-car"></i> Rego - {{ job.vehicle_registration }}</p>
+        <p><i class="fas fa-clock"></i> Target Duration -
+          {% if job.target_duration %}
+          {% set duration = job.target_duration|int %}
+          {% set h = duration // 60 %}
+          {% set m = duration % 60 %}
+          {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
+          {% else %}
+          N/A
+          {% endif %}
+        </p>
+      </div>
+
+      {% if current_user.role == 'admin' %}
+      <div class="job-actions">
+        <div class="top-buttons">
+          <a href="{{ url_for('main.edit_job', id=job.id) }}" class="edit-btn"><i class="fas fa-edit"></i> Edit</a>
+          <form action="{{ url_for('main.delete_job', id=job.id) }}" method="POST" class="delete-form">
+            <button type="submit" onclick="return confirm('Are you sure?')" class="delete-btn"><i
+                class="fas fa-trash"></i> Delete</button>
+          </form>
+        </div>
+        <div class="bottom-button">
+          <a href="{{ url_for('main.jobs_waiting_approval') }}" class="approval-btn"><i class="fas fa-check"></i>
+            Waiting
+            Approval</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

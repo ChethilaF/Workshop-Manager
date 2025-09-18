@@ -3,106 +3,131 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='edit_job.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/job_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="job-form-container">
-  <a href="{{ url_for('main.jobs') }}" class="back-button">
-    <i class="fas fa-arrow-left"></i> Back
-  </a>
+<h2>Edit Job</h2>
 
-  <h2>Edit Job</h2>
-  <form method="POST">
+<div class="body-content">
+  <div class="job-form-container">
+    <a href="{{ url_for('main.jobs') }}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+    
+    <!-- Edit Job form -->
 
-    <label>Job Title :</label>
-    <div class="input-group">
-      <i class="fas fa-briefcase"></i>
-      <input type="text" name="description" value="{{ job.description }}" placeholder="Job description" required>
-    </div>
+    <form method="POST">
+      <!-- Job description -->
+      <div class="input-group">
+        <label for="description"><i class="fas fa-briefcase"></i> Job Description</label>
+        <input type="text" id="description" name="description" placeholder="Job description" required
+          value="{{ job.job_description }}">
+      </div>
 
-    <label>Start Date :</label>
-    <div class="input-group">
-      <i class="fas fa-calendar-alt"></i>
-      <input type="date" name="start_date" value="{{ job.start_date }}">
-    </div>
+      <!-- Start date -->
+      <div class="input-group">
+        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
+        <input type="date" id="start_date" name="start_date"
+          value="{{ job.start_date.strftime('%Y-%m-%d') if job.start_date else '' }}">
+      </div>
 
-    <label>End Date :</label>
-    <div class="input-group">
-      <i class="fas fa-calendar-check"></i>
-      <input type="date" name="end_date" value="{{ job.end_date }}">
-    </div>
+      <!-- End date -->
+      <div class="input-group">
+        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
+        <input type="date" id="end_date" name="end_date"
+          value="{{ job.end_date.strftime('%Y-%m-%d') if job.end_date else '' }}">
+      </div>
 
-    <label>Status :</label>
-    <div class="input-group">
-      <i class="fas fa-tasks"></i>
-      <select name="status">
-        <option value="Pending" {% if job.status=='Pending' %}selected{% endif %}>Pending</option>
-        <option value="In Progress" {% if job.status=='In Progress' %}selected{% endif %}>In Progress</option>
-        <option value="Completed" {% if job.status=='Completed' %}selected{% endif %}>Completed</option>
-      </select>
-    </div>
+      <!-- Target duration -->
+      <div class="input-group">
+        <label><i class="fas fa-clock"></i> Target Duration:</label>
+        <div class="duration-selects">
+          <select name="target_hours">
+            {% for h in range(0, 13) %}
+            <option value="{{ h }}" {% if job and target_hours==h %}selected{% endif %}>
+              {{ h }} hr{% if h != 1 %}s{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+          <select name="target_minutes">
+            {% for m in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] %}
+            <option value="{{ m }}" {% if job and target_minutes==m %}selected{% endif %}>
+              {{ m }} min
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
 
-    <label>Total Cost ($) :</label>
-    <div class="input-group">
-      <i class="fas fa-dollar-sign"></i>
-      <input type="number" name="total_cost" step="0.01" value="{{ job.total_cost }}">
-    </div>
+      <!-- Status -->
+      <div class="input-group">
+        <label for="status"><i class="fas fa-tasks"></i> Status:</label>
+        <select id="status" name="status">
+          {% for s in ['Pending','In Progress','Completed'] %}
+          <option value="{{ s }}" {% if job.status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <label>Payment Status :</label>
-    <div class="input-group">
-      <i class="fas fa-credit-card"></i>
-      <select name="payment_status">
-        <option value="Unpaid" {% if job.payment_status=='Unpaid' %}selected{% endif %}>Unpaid</option>
-        <option value="Paid" {% if job.payment_status=='Paid' %}selected{% endif %}>Paid</option>
-      </select>
-    </div>
+      <!-- Customer -->
+      <div class="input-group">
+        <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
+        <select id="customer_id" name="customer_id">
+          {% for customer in customers %}
+          <option value="{{ customer.id }}" {% if job.customer_id==customer.id %}selected{% endif %}>{{ customer.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <label>Customer :</label>
-    <div class="input-group">
-      <i class="fas fa-user"></i>
-      <select name="customer_id">
-        {% for customer in customers %}
-          <option value="{{ customer.id }}" {% if customer.id==job.customer_id %}selected{% endif %}>{{ customer.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
+      <!-- Technician -->
+      <div class="input-group">
+        <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
+        <select id="technician_id" name="technician_id">
+          {% for tech in technicians %}
+          <option value="{{ tech.id }}" {% if job.technician_id==tech.id %}selected{% endif %}>{{ tech.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <label>Technician :</label>
-    <div class="input-group">
-      <i class="fas fa-user-cog"></i>
-      <select name="technician_id">
-        {% for tech in technicians %}
-          <option value="{{ tech.id }}" {% if tech.id==job.technician_id %}selected{% endif %}>{{ tech.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
+      <!-- Vehicle Details -->
+      <div class="input-group">
+        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration:</label>
+        <input type="text" id="vehicle_registration" name="vehicle_registration" value="{{ job.vehicle_registration }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make:</label>
+        <input type="text" id="vehicle_make" name="vehicle_make" value="{{ job.vehicle_make }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_model"><i class="fas fa-car"></i> Vehicle Model:</label>
+        <input type="text" id="vehicle_model" name="vehicle_model" value="{{ job.vehicle_model }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year:</label>
+        <input type="number" id="vehicle_year" name="vehicle_year" value="{{ job.vehicle_year }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color:</label>
+        <input type="text" id="vehicle_color" name="vehicle_color" value="{{ job.vehicle_color }}">
+      </div>
 
-    <label>Vehicle Make :</label>
-    <div class="input-group">
-      <i class="fas fa-car"></i>
-      <input type="text" name="vehicle_make" value="{{ job.vehicle_make }}" placeholder="Vehicle Make (e.g. Toyota)" required>
-    </div>
+      <!-- Cost -->
+      <div class="input-group">
+        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost:</label>
+        <input type="number" id="total_cost" name="total_cost" step="0.01" value="{{ job.total_cost }}">
+      </div>
 
-    <label>Vehicle Model:</label>
-    <div class="input-group">
-      <i class="fas fa-car"></i>
-      <input type="text" name="vehicle_model" value="{{ job.vehicle_model }}" placeholder="Vehicle Model (e.g. Corolla)" required>
-    </div>
+      <!-- Notes -->
+      <div class="input-group">
+        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes:</label>
+        <textarea id="notes" name="notes">{{ job.notes }}</textarea>
+      </div>
 
-    <label>Vehicle Year:</label>
-    <div class="input-group">
-      <i class="fas fa-calendar"></i>
-      <input type="number" name="vehicle_year" value="{{ job.vehicle_year }}" placeholder="Vehicle Year (e.g. 2020)" required>
-    </div>
-
-    <label>Vehicle Registration:</label>
-    <div class="input-group">
-      <i class="fas fa-id-card"></i>
-      <input type="text" name="vehicle_registration" value="{{ job.vehicle_registration }}" placeholder="Vehicle Registration (e.g. ABC123)" required>
-    </div>
-
-    <button type="submit" class="btn-submit">Update Job</button>
-  </form>
+      <!-- Submit button -->
+      <button type="submit" class="submit-button">Update Job</button>
+    </form>
+  </div>
 </div>
 {% endblock %}
