@@ -10,13 +10,18 @@
 {% endblock %}
 
 {% block content %}
+<!-- Page heading -->
 <h2>Shift Dashboard</h2>
 
+<!-- Technician grid -->
 <div class="tech-grid">
   {% for tech in techs %}
-  <form action="{{ url_for('main.log_shift', tech_id=tech.id) }}" method="get">
-    <button type="submit" class="tech-circle">{{ tech.name }}</button>
-  </form>
+    <!-- Each technician is a button inside a form to log their shift -->
+    <form action="{{ url_for('main.log_shift', tech_id=tech.id) }}" method="get">
+      <button type="submit" class="tech-circle" aria-label="Log shift for {{ tech.name }}">
+        {{ tech.name }}
+      </button>
+    </form>
   {% endfor %}
 </div>
 {% endblock %}
@@ -25,7 +30,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   console.log("📋 Shift Dashboard loaded");
-  // Additional JS if needed for future enhancements
+  // Future enhancements: e.g., highlighting circles for active shifts
 });
 </script>
 {% endblock %}

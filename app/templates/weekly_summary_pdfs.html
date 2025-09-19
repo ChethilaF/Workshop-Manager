@@ -1,7 +1,39 @@
 {% extends "layout.html" %}
+
 {% block title %}Weekly Summary PDFs{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/weekly_summary_pdfs.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Fade-in animation for PDF lists */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pdf-list {
+  margin-top: 10px;
+}
+.tech-card {
+  margin-bottom: 15px;
+}
+.generate-btn, .download-btn {
+  margin-top: 5px;
+}
+.pdf-list {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.pdf-list.open {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -10,20 +42,31 @@
 <div class="tech-grid">
   {% for tech in techs %}
   <div class="tech-card" id="tech-{{ tech.id }}">
-    <button class="tech-circle" data-tech-id="{{ tech.id }}">{{ tech.name }}</button>
+    <button class="tech-circle" data-tech-id="{{ tech.id }}">
+      {{ tech.name }}
+    </button>
 
-    <!-- Hidden div showing PDFs and generate button -->
+    <!-- Hidden PDF list -->
     <div class="pdf-list" id="pdf-list-{{ tech.id }}" style="display:none;">
+      {% set pdfs = get_pdfs_for_tech(tech.id) %}
+      {% if pdfs %}
       <ul>
-        {% for pdf in get_pdfs_for_tech(tech.id) %}
+        {% for pdf in pdfs %}
         <li>
-          {{ pdf }} 
-          <a href="{{ url_for('main.download_pdf', filename=pdf) }}" class="download-btn">Download</a>
+          <span>{{ pdf }}</span>
+          <a href="{{ url_for('main.download_pdf', filename=pdf) }}" class="download-btn" aria-label="Download {{ pdf }}">
+            <i class="fas fa-download"></i> Download
+          </a>
         </li>
         {% endfor %}
       </ul>
+      {% else %}
+      <p>No PDFs generated yet.</p>
+      {% endif %}
       <form method="POST" action="{{ url_for('main.generate_weekly_summary', tech_id=tech.id) }}">
-        <button type="submit" class="generate-btn">Generate PDF</button>
+        <button type="submit" class="generate-btn" aria-label="Generate PDF for {{ tech.name }}">
+          <i class="fas fa-file-pdf"></i> Generate PDF
+        </button>
       </form>
     </div>
   </div>
@@ -33,17 +76,38 @@
 
 {% block extra_js %}
 <script>
-document.querySelectorAll('.tech-circle').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const techId = btn.dataset.techId;
-        const div = document.getElementById(`pdf-list-${techId}`);
-        if (div.style.display === "none") {
-            div.style.display = "block";
-            div.style.animation = "fadeIn 0.5s forwards";
-        } else {
-            div.style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+  const buttons = document.querySelectorAll(".tech-circle");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const techId = btn.dataset.techId;
+      const list = document.getElementById(`pdf-list-${techId}`);
+
+      // Collapse all other lists
+      document.querySelectorAll(".pdf-list").forEach(other => {
+        if (other !== list) {
+          other.classList.remove("open");
+          other.style.display = "none";
+          const otherBtn = other.closest(".tech-card").querySelector(".tech-circle");
+          if (otherBtn) otherBtn.setAttribute("aria-expanded", "false");
         }
+      });
+
+      // Toggle this one
+      const isOpen = list.classList.contains("open");
+      if (isOpen) {
+        list.classList.remove("open");
+        list.style.display = "none";
+        btn.setAttribute("aria-expanded", "false");
+      } else {
+        list.style.display = "block";
+        list.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
     });
+  });
 });
 </script>
 {% endblock %}
+

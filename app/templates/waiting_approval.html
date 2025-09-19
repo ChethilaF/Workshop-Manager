@@ -10,39 +10,44 @@
 {% endblock %}
 
 {% block content %}
-<!-- Container for jobs waiting approval -->
 <div class="approval-jobs">
-  <!-- Page heading -->
   <h2>Jobs Waiting for Approval</h2>
 
-  <!-- Check if there are jobs to approve -->
   {% if jobs %}
-    <ul class="approval-list">
-      {% for job in jobs %}
-      <li class="approval-item">
-        <!-- Display job details -->
+  <ul class="approval-list">
+    {% for job in jobs %}
+    <li class="approval-item">
+      <!-- Job information -->
+      <div class="job-info">
         <strong>{{ job.description }}</strong><br>
-        Vehicle: {{ job.vehicle_registration }}<br>
-        Technician: {{ job.technician.name }}<br>
-        Customer: {{ job.customer.name }}<br>
-        Duration: {{ job.total_work_duration }} seconds<br>
+        <small><i class="fas fa-car"></i> Vehicle: {{ job.vehicle_registration }}</small><br>
+        <small><i class="fas fa-wrench"></i> Technician: {{ job.technician.name }}</small><br>
+        <small><i class="fas fa-user"></i> Customer: {{ job.customer.name }}</small><br>
+        <small><i class="fas fa-clock"></i> Duration: {{ job.total_work_duration }} seconds</small>
+      </div>
 
-        <!-- Approve job button -->
-        <form method="POST" action="{{ url_for('main.approve_job', job_id=job.id) }}" style="display:inline-block">
-          <button type="submit" class="btn-confirm">Confirm Job</button>
+      <!-- Action buttons -->
+      <div class="job-actions">
+        <!-- Confirm/Approve Job -->
+        <form method="POST" action="{{ url_for('main.approve_job', job_id=job.id) }}">
+          <button type="submit" class="btn-confirm" aria-label="Confirm job {{ job.description }}">
+            <i class="fas fa-check"></i> Confirm Job
+          </button>
         </form>
 
-        <!-- Retry job button -->
-        <form method="POST" action="{{ url_for('main.retry_job', job_id=job.id) }}" style="display:inline-block">
-          <button type="submit" class="btn-retry">Retry Job</button>
+        <!-- Retry Job -->
+        <form method="POST" action="{{ url_for('main.retry_job', job_id=job.id) }}">
+          <button type="submit" class="btn-retry" aria-label="Retry job {{ job.description }}">
+            <i class="fas fa-undo"></i> Retry Job
+          </button>
         </form>
-      </li>
-      {% endfor %}
-    </ul>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
 
   {% else %}
-    <!-- Message when no jobs are waiting -->
-    <p>No jobs waiting for approval.</p>
+  <p>No jobs waiting for approval.</p>
   {% endif %}
 </div>
 {% endblock %}

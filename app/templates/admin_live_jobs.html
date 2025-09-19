@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block title %}Live Jobs{% endblock %}
 
-{% block styles %}
-<!-- Using admin dashboard CSS for styling -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+{% block extra_css %}
+<!-- Using admin dashboard CSS for styling live jobs -->
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -13,31 +14,52 @@
 <!-- Grid container for live job cards -->
 <div class="live-jobs-grid">
   {% for job in jobs %}
-  <div class="job-card" tabindex="0" aria-label="Live job card for Job #{{ job.id }}">
+  <div class="job-card" tabindex="0"
+       aria-label="Live job card for Job #{{ job.id }}">
+       
     <!-- Job identification -->
     <h3>Job #{{ job.id }} - {{ job.vehicle_reg }}</h3>
+    
+    <!-- Assigned technician -->
     <p><strong>Technician:</strong> {{ job.technician.name }}</p>
+    
+    <!-- Job status -->
     <p>
-      <strong>Status:</strong> 
-      <span class="status {{ job.status|lower }}" aria-label="Job status is {{ job.status }}">
+      <strong>Status:</strong>
+      <span class="status {{ job.status|lower }}"
+            aria-label="Job status is {{ job.status }}">
         {{ job.status }}
       </span>
     </p>
+    
+    <!-- Start time -->
     <p>
-      <strong>Started:</strong> 
-      {{ job.start_time.strftime('%H:%M %d-%m-%Y') if job.start_time else "Not started" }}
+      <strong>Started:</strong>
+      {{ job.start_time.strftime('%H:%M %d-%m-%Y') if job.start_time
+         else "Not started" }}
     </p>
+    
+    <!-- Elapsed time -->
     <p>
-      <strong>Elapsed:</strong> 
+      <strong>Elapsed:</strong>
       {{ job.elapsed_time if job.elapsed_time else "00:00:00" }}
     </p>
 
-    <!-- Action buttons -->
-    <form action="{{ url_for('main.admin_action', job_id=job.id) }}" method="post">
-      <button type="submit" name="action" value="pause" class="btn-warning" aria-label="Pause Job {{ job.id }}">Pause</button>
-      <button type="submit" name="action" value="resume" class="btn-success" aria-label="Resume Job {{ job.id }}">Resume</button>
-      <button type="submit" name="action" value="stop" class="btn-danger" aria-label="Stop Job {{ job.id }}">Stop</button>
-      <button type="submit" name="action" value="reassign" class="btn-primary" aria-label="Reassign technician for Job {{ job.id }}">Reassign Tech</button>
+    <!-- Action buttons for admin -->
+    <form action="{{ url_for('main.admin_action', job_id=job.id) }}"
+          method="post">
+      <button type="submit" name="action" value="pause"
+              class="btn-warning"
+              aria-label="Pause Job {{ job.id }}">Pause</button>
+      <button type="submit" name="action" value="resume"
+              class="btn-success"
+              aria-label="Resume Job {{ job.id }}">Resume</button>
+      <button type="submit" name="action" value="stop"
+              class="btn-danger"
+              aria-label="Stop Job {{ job.id }}">Stop</button>
+      <button type="submit" name="action" value="reassign"
+              class="btn-primary"
+              aria-label="Reassign technician for Job {{ job.id }}">Reassign Tech</button>
     </form>
   </div>
   {% endfor %}

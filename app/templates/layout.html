@@ -36,19 +36,14 @@
       <nav class="nav-right">
         <ul>
           {% if current_user.is_authenticated %}
-          <li><a href="{{ url_for('main.staff_dashboard') }}"
-              class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
-          <li><a href="{{ url_for('main.customers') }}"
-              class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
-          <li><a href="{{ url_for('main.technicians') }}"
-              class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
-          <li><a href="{{ url_for('main.jobs') }}"
-              class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+          <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+          <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+          <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+          <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
 
           <!-- Admin-only link -->
           {% if current_user.role == 'admin' %}
-          <li><a href="{{ url_for('main.admin_dashboard') }}"
-              class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
+          <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
           {% endif %}
 
           <!-- Logout link -->
@@ -75,17 +70,12 @@
   <div class="mobile-nav" id="mobile-nav">
     <ul>
       {% if current_user.is_authenticated %}
-      <li><a href="{{ url_for('main.staff_dashboard') }}"
-          class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
-      <li><a href="{{ url_for('main.customers') }}"
-          class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
-      <li><a href="{{ url_for('main.technicians') }}"
-          class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
-      <li><a href="{{ url_for('main.jobs') }}"
-          class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
+      <li><a href="{{ url_for('main.staff_dashboard') }}" class="{% if request.endpoint == 'main.staff_dashboard' %}active{% endif %}">Dashboard</a></li>
+      <li><a href="{{ url_for('main.customers') }}" class="{% if request.endpoint == 'main.customers' %}active{% endif %}">Customers</a></li>
+      <li><a href="{{ url_for('main.technicians') }}" class="{% if request.endpoint == 'main.technicians' %}active{% endif %}">Technicians</a></li>
+      <li><a href="{{ url_for('main.jobs') }}" class="{% if request.endpoint == 'main.jobs' %}active{% endif %}">Jobs</a></li>
       {% if current_user.role == 'admin' %}
-      <li><a href="{{ url_for('main.admin_dashboard') }}"
-          class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
+      <li><a href="{{ url_for('main.admin_dashboard') }}" class="{% if request.endpoint == 'main.admin_dashboard' %}active{% endif %}">Admin</a></li>
       {% endif %}
       <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
       {% endif %}
@@ -101,14 +91,13 @@
     <div class="flash-container">
       {% for category, message in messages %}
       <div class="flash-message {{ category }}">
-        <span class="flash-text"><i class="fa fa-info-circle"></i> {{ message }}</span>
-        <button class="flash-close" onclick="this.parentElement.style.display='none';">&times;</button>
+        <i class="fa fa-info-circle"></i> {{ message }}
+        <button class="flash-close" onclick="this.parentElement.remove()">×</button>
       </div>
       {% endfor %}
     </div>
     {% endif %}
     {% endwith %}
-
 
 
     <!-- Content block for child templates -->
@@ -188,5 +177,4 @@
   <!-- Extra JS block for child templates -->
   {% block extra_js %}{% endblock %}
 </body>
-
 </html>

@@ -2,24 +2,30 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block extra_css %}
+<!-- Page-specific CSS for admin dashboard -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Font Awesome icons -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-papqZ1+MZtzYh0YFkibMH0yovm29sH6T7pNNvT4JpyD1EIQhKiLPqcO3V+u8wzV6x6bfv5d3ZlzZz4UuTq8O2g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer" />
 {% endblock %}
 
 {% block content %}
 <h2>Admin Dashboard</h2>
 
 <div class="dashboard-container">
+    <!-- Welcome message -->
     <p class="welcome-text">
         Welcome, {{ current_user.username }}! <br>
         You have administrative privileges.
     </p>
 
     <div class="dashboard-grid">
-
         <!-- Staff Management card -->
-        <a href="{{ url_for('main.staff_dashboard') }}" 
-           class="dashboard-card" 
+        <a href="{{ url_for('main.staff_dashboard') }}"
+           class="dashboard-card"
            aria-label="Go to Staff Management section">
             <i class="fas fa-users-cog"></i>
             <h3>Staff Management</h3>
@@ -27,8 +33,8 @@
         </a>
 
         <!-- Jobs card -->
-        <a href="{{ url_for('main.jobs') }}" 
-           class="dashboard-card" 
+        <a href="{{ url_for('main.jobs') }}"
+           class="dashboard-card"
            aria-label="Go to Jobs section">
             <i class="fas fa-clipboard-list"></i>
             <h3>Jobs</h3>
@@ -36,8 +42,8 @@
         </a>
 
         <!-- Customers card -->
-        <a href="{{ url_for('main.customers') }}" 
-           class="dashboard-card" 
+        <a href="{{ url_for('main.customers') }}"
+           class="dashboard-card"
            aria-label="Go to Customers section">
             <i class="fas fa-user-friends"></i>
             <h3>Customers</h3>
@@ -45,8 +51,8 @@
         </a>
 
         <!-- Weekly Summary PDFs card -->
-        <a href="{{ url_for('main.weekly_summary_dashboard') }}" 
-           class="dashboard-card" 
+        <a href="{{ url_for('main.weekly_summary_dashboard') }}"
+           class="dashboard-card"
            aria-label="Go to Weekly Summary PDFs section">
             <i class="fas fa-file-pdf"></i>
             <h3>Weekly Summary PDFs</h3>
@@ -54,14 +60,13 @@
         </a>
 
         <!-- Live Jobs card -->
-        <a href="{{ url_for('main.live_jobs') }}" 
-           class="dashboard-card" 
+        <a href="{{ url_for('main.live_jobs') }}"
+           class="dashboard-card"
            aria-label="Go to Live Jobs section">
             <i class="fas fa-bolt"></i>
             <h3>Live Jobs</h3>
             <p>Monitor and manage live jobs</p>
         </a>
-
     </div>
 </div>
 {% endblock %}

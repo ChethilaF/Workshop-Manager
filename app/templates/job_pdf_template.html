@@ -12,7 +12,7 @@
       color: #333;
     }
 
-    /* Title styling */
+    /* Main title */
     h1 {
       font-size: 22px;
       margin-bottom: 10px;
@@ -45,7 +45,7 @@
       margin: 3px 0;
     }
 
-    /* Each pause entry */
+    /* Pause history entries */
     .pause-history li {
       margin-bottom: 10px;
     }
@@ -56,31 +56,34 @@
   <!-- Main title -->
   <h1>Job Summary Report</h1>
 
-  <!-- Section: Job details -->
+  <!-- Job Details -->
   <div class="job-info">
     <p><strong>Technician:</strong> {{ technician.name }}</p>
-    <p><strong>Vehicle Registration:</strong> {{ job.vehicle_registration }}</p>
-    <p><strong>Description:</strong> {{ job.description }}</p>
-    <p><strong>Status:</strong> {{ job.status }}</p>
-    <!-- Handle null start/end times safely -->
+    <p><strong>Vehicle Registration:</strong> {{ job.vehicle_registration or 'N/A' }}</p>
+    <p><strong>Vehicle Make & Model:</strong> {{ job.vehicle_make or 'N/A' }} {{ job.vehicle_model or '' }}</p>
+    <p><strong>Description:</strong> {{ job.description or 'N/A' }}</p>
+    <p><strong>Status:</strong> {{ job.status or 'N/A' }}</p>
     <p><strong>Start Time:</strong> {{ job.start_time.strftime('%Y-%m-%d %H:%M:%S') if job.start_time else 'N/A' }}</p>
     <p><strong>End Time:</strong> {{ job.end_time.strftime('%Y-%m-%d %H:%M:%S') if job.end_time else 'N/A' }}</p>
-    <p><strong>Total Time Worked:</strong> {{ duration }}</p>
+    <p><strong>Total Time Worked:</strong> {{ duration or '00:00:00' }}</p>
+    <p><strong>Total Cost:</strong> ${{ job.total_cost or '0.00' }}</p>
   </div>
 
-  <!-- Section: Pause history (only shown if data exists) -->
+  <!-- Pause / Resume History -->
   {% if pauses %}
   <h2>Pause History</h2>
   <ul class="pause-history">
     {% for pause in pauses %}
     <li>
       <strong>Paused at:</strong> {{ pause.paused_at.strftime('%Y-%m-%d %H:%M:%S') }}<br>
-      <strong>Resumed at:</strong> {{ pause.resumed_at.strftime('%Y-%m-%d %H:%M:%S') if pause.resumed_at else '(not resumed)' }}<br>
+      <strong>Resumed at:</strong> {{ pause.resumed_at.strftime('%Y-%m-%d %H:%M:%S') if pause.resumed_at else 'Not Resumed' }}<br>
+      <strong>Elapsed Timer:</strong> {{ "%02d:%02d:%02d"|format(pause.timer_value // 3600, (pause.timer_value % 3600) // 60, pause.timer_value % 60) }}<br>
       <strong>Reason:</strong> {{ pause.reason or 'N/A' }}
     </li>
     {% endfor %}
   </ul>
   {% endif %}
+
 </body>
 
 </html>

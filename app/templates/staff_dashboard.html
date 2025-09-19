@@ -3,7 +3,6 @@
 {% block extra_css %}
 <!-- Page-specific CSS for staff dashboard layout -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/staff_dashboard.css') }}">
-<!-- Font Awesome icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
@@ -27,20 +26,26 @@
 <!-- Grid of technician buttons -->
 <div class="tech-grid">
   {% for tech in techs %}
-  <!-- Each technician is a form button that routes to their jobs page -->
-  <form action="{{ url_for('main.staff_jobs', tech_id=tech.id) }}" method="get">
-    <button type="submit" class="tech-circle">{{ tech.name }}</button>
-  </form>
+    <!-- Each technician is a button inside a form that routes to their jobs page -->
+    <form action="{{ url_for('main.staff_jobs', tech_id=tech.id) }}" method="get">
+      <button type="submit" class="tech-circle" aria-label="View jobs for {{ tech.name }}">
+        {{ tech.name }}
+      </button>
+    </form>
   {% endfor %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-(function() {
-  console.log("📢 Staff Dashboard JS loaded");
+document.addEventListener("DOMContentLoaded", () => {
 
-  // Convert VAPID key to Uint8Array required by Push API
+  const enableBtn = document.getElementById("enableNotifications");
+  const disableBtn = document.getElementById("disableNotifications");
+
+  if (!enableBtn || !disableBtn) return;
+
+  // Helper: convert VAPID key
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -48,88 +53,84 @@
     return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
   }
 
-  // Enable push notifications
-  async function registerPush() {
-    console.log("Enable Notifications clicked");
-
-    const perm = await Notification.requestPermission();
-    if (perm !== "granted") {
-      alert("Notifications not allowed!");
-      return;
+  // Update buttons based on subscription
+  async function updateButtons() {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        enableBtn.style.display = "none";
+        disableBtn.style.display = "inline-block";
+      } else {
+        enableBtn.style.display = "inline-block";
+        disableBtn.style.display = "none";
+      }
+    } catch (err) {
+      console.error("Error checking push subscription:", err);
     }
-
-    // Register service worker
-    const registration = await navigator.serviceWorker.register("/service-worker.js");
-    console.log("Service Worker registered", registration);
-
-    const vapidPublicKey = "{{ vapid_public_key|safe }}";
-    console.log("Using VAPID key:", vapidPublicKey);
-
-    // Subscribe to push notifications
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-    });
-
-    console.log("Got subscription:", subscription);
-
-    // Send subscription to server
-    await fetch("/save-subscription", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(subscription)
-    });
-
-    alert("Notifications enabled!");
-    document.getElementById("enableNotifications").style.display = "none";
-    document.getElementById("disableNotifications").style.display = "inline-block";
   }
 
-  // Disable push notifications
-  async function unsubscribePush() {
-    console.log("Disable Notifications clicked");
+  // Enable notifications
+  async function enableNotifications() {
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        alert("Notifications permission denied.");
+        return;
+      }
 
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-    if (subscription) {
-      await fetch("/unsubscribe", {
+      const registration = await navigator.serviceWorker.register("/service-worker.js");
+      const vapidKey = "{{ vapid_public_key|safe }}";
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey)
+      });
+
+      await fetch("/save-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(subscription)
       });
-      await subscription.unsubscribe();
-      alert("Notifications disabled!");
-    }
 
-    document.getElementById("enableNotifications").style.display = "inline-block";
-    document.getElementById("disableNotifications").style.display = "none";
+      updateButtons();
+      alert("Notifications enabled!");
+    } catch (err) {
+      console.error("Failed to enable notifications:", err);
+      alert("Error enabling notifications.");
+    }
   }
 
-  // DOM ready
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("DOM ready");
-
-    const enableBtn = document.getElementById("enableNotifications");
-    const disableBtn = document.getElementById("disableNotifications");
-
-    if (!enableBtn) {
-      console.error("Enable Notifications button not found!");
-      return;
-    }
-
-    // Event listeners for enabling/disabling notifications
-    enableBtn.addEventListener("click", registerPush);
-    disableBtn.addEventListener("click", unsubscribePush);
-
-    // Check if already subscribed and toggle buttons accordingly
-    navigator.serviceWorker.ready.then(async reg => {
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        enableBtn.style.display = "none";
-        disableBtn.style.display = "inline-block";
+  // Disable notifications
+  async function disableNotificationsFunc() {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        await fetch("/unsubscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(subscription)
+        });
+        await subscription.unsubscribe();
       }
-    });
-  });
-})();
+
+      updateButtons();
+      alert("Notifications disabled!");
+    } catch (err) {
+      console.error("Failed to disable notifications:", err);
+      alert("Error disabling notifications.");
+    }
+  }
+
+  // Event listeners
+  enableBtn.addEventListener("click", enableNotifications);
+  disableBtn.addEventListener("click", disableNotificationsFunc);
+
+  // Initial button state
+  updateButtons();
+
+});
 </script>
 {% endblock %}
+

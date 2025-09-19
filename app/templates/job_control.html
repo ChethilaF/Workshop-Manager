@@ -2,6 +2,7 @@
 {% block title %}Job Control{% endblock %}
 
 {% block extra_css %}
+<!-- Page-specific CSS for job control -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/job_control.css') }}">
 {% endblock %}
 
@@ -9,7 +10,7 @@
 <div class="body-content">
   <div class="job-control-container">
 
-    <!-- Job Info -->
+    <!-- Job Information Section -->
     <div class="job-header">
       <h2>{{ job.description }}</h2>
       <div class="vehicle-info">
@@ -21,7 +22,7 @@
       </div>
     </div>
 
-    <!-- Timer & Progress -->
+    <!-- Timer and Progress Section -->
     <div class="timer-section">
       <div class="timer-box">
         <p>Elapsed Time</p>
@@ -45,6 +46,7 @@
           {% endif %}
         </span>
       </div>
+      <!-- Progress bar visualizing elapsed time vs target -->
       <div class="progress-bar-container">
         <div id="progressBar" class="progress-bar"></div>
       </div>
@@ -52,19 +54,20 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <!-- START JOB -->
+      <!-- Start Job -->
       <form action="{{ url_for('main.start_job', job_id=job.id) }}" method="POST">
-        <button id="startButton" class="action-button start-button" 
-          {% if job.status in ['Running','In Progress'] %}disabled{% endif %}>
+        <button id="startButton" class="action-button start-button" {% if job.status in ['Running','In Progress']
+          %}disabled{% endif %}>
           <i class="fa fa-play"></i> Start Job
         </button>
       </form>
 
-      <!-- PAUSE -->
+      <!-- Pause Job with reason -->
       <div class="pause-container">
         <form action="{{ url_for('main.pause_job', job_id=job.id) }}" method="POST">
-          <button type="button" class="action-button pause-button" onclick="togglePauseBox()">Pause Job</button>
-          <!-- Hidden reason box -->
+          <button type="button" class="action-button pause-button" onclick="togglePauseBox()">
+            Pause Job
+          </button>
           <div id="pauseReasonBox" class="pause-reason-box">
             <input type="text" name="reason" placeholder="Enter reason" required>
             <button type="submit" class="btn-confirm-pause">Confirm Pause</button>
@@ -72,14 +75,14 @@
         </form>
       </div>
 
-      <!-- RESUME JOB -->
+      <!-- Resume Job -->
       <form action="{{ url_for('main.resume_job', job_id=job.id) }}" method="POST">
         <button id="resumeButton" class="action-button resume-button">
           <i class="fa fa-play-circle"></i> Resume Job
         </button>
       </form>
 
-      <!-- STOP JOB -->
+      <!-- Stop Job -->
       <form action="{{ url_for('main.stop_job', job_id=job.id) }}" method="POST">
         <button id="stopButton" class="action-button stop-button">
           <i class="fa fa-stop-circle"></i> Stop Job
@@ -95,7 +98,8 @@
         {% for p in job.pauses %}
         <li>
           <strong>Paused:</strong> {{ p.paused_at }} |
-          <strong>Timer:</strong> {{ "%02d:%02d:%02d"|format(p.timer_value // 3600, (p.timer_value % 3600)//60, p.timer_value % 60) }} |
+          <strong>Timer:</strong> {{ "%02d:%02d:%02d"|format(p.timer_value // 3600, (p.timer_value % 3600)//60,
+          p.timer_value % 60) }} |
           <strong>Resumed:</strong> {{ p.resumed_at if p.resumed_at else 'Not resumed yet' }} |
           <strong>Reason:</strong> {{ p.reason }}
         </li>
@@ -109,80 +113,100 @@
   </div>
 </div>
 
-<!-- Hidden inputs for JS -->
+<!-- Hidden fields to pass data to JS -->
 <input type="hidden" id="initialElapsed" value="{{ job.total_work_duration or 0 }}">
 <input type="hidden" id="targetSeconds" value="{{ job.target_duration_seconds or 5400 }}">
 <input type="hidden" id="jobStartTime" value="{{ job.start_time | tojson }}">
 
+<!-- Job Control JavaScript -->
 <script>
-// Job Control JS
-let elapsedSeconds = parseInt(document.getElementById('initialElapsed').value);
-const targetSeconds = parseInt(document.getElementById('targetSeconds').value);
-const liveTimer = document.getElementById('liveTimer');
-const progressBar = document.getElementById('progressBar');
-const jobStatusLabel = document.getElementById('jobStatusLabel');
-const startButton = document.getElementById('startButton');
-const jobStartStr = document.getElementById('jobStartTime').value;
-let jobStart = jobStartStr ? new Date(jobStartStr) : null;
-let timerInterval = null;
+  // Get hidden values from template
+  let elapsedSeconds = parseInt(document.getElementById('initialElapsed').value); // total previous work
+  const targetSeconds = parseInt(document.getElementById('targetSeconds').value); // total target duration in seconds
+  const liveTimer = document.getElementById('liveTimer');
+  const progressBar = document.getElementById('progressBar');
+  const jobStatusLabel = document.getElementById('jobStatusLabel');
+  const startButton = document.getElementById('startButton');
+  const jobStartStr = document.getElementById('jobStartTime').value;
+  let jobStart = jobStartStr ? new Date(jobStartStr) : null;
+  let timerInterval = null;
 
-// Format seconds as HH:MM:SS or d:h:m:s
-function formatTime(seconds) {
+  // Format seconds to d:h:m:s
+  function formatTime(seconds) {
     const d = Math.floor(seconds / 86400);
     const h = Math.floor((seconds % 86400) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    if(d>0) return `${d}d ${h}h ${m}m ${s}s`;
-    if(h>0) return `${h}h ${m}m ${s}s`;
-    return `${m}m ${s}s`;
-}
+    let str = '';
+    if (d > 0) str += `${d}d `;
+    if (h > 0 || d > 0) str += `${h}h `;
+    if (m > 0 || h > 0 || d > 0) str += `${m}m `;
+    str += `${s}s`;
+    return str;
+  }
 
-// Update timer and progress bar
-function updateTimer() {
+  // Update timer and progress bar
+  function updateTimer() {
     let total = elapsedSeconds;
-    if(jobStart){
-        total += Math.floor((new Date() - jobStart)/1000);
+    if (jobStart) {
+      total += Math.floor((new Date() - jobStart) / 1000);
     }
-    liveTimer.innerText = formatTime(total);
-    let percent = Math.min(100, (total / targetSeconds)*100);
-    progressBar.style.width = percent + '%';
-    progressBar.style.backgroundColor = total > targetSeconds ? 'red':'#00c8df';
-}
 
-// Start timer
-function startTimer(){
-    if(timerInterval) return;
-    if(!jobStart) jobStart = new Date();
+    // Update live timer text
+    liveTimer.innerText = formatTime(total);
+
+    // Update progress bar width
+    let percent = Math.min(100, (total / targetSeconds) * 100);
+    progressBar.style.width = percent + '%';
+
+    // Change bar color if over target
+    progressBar.style.backgroundColor = total > targetSeconds ? 'red' : '#00c8df';
+  }
+
+  // Start the timer
+  function startTimer() {
+    if (timerInterval) return;
+    if (!jobStart) jobStart = new Date();
     startButton.disabled = true;
     jobStatusLabel.innerText = 'Running';
     timerInterval = setInterval(updateTimer, 1000);
-}
+  }
 
-// Stop timer
-function stopTimer(){
+  // Pause timer (without resetting elapsedSeconds)
+  function pauseTimer() {
+    if (jobStart) {
+      elapsedSeconds += Math.floor((new Date() - jobStart) / 1000);
+      jobStart = null;
+    }
     clearInterval(timerInterval);
-    jobStatusLabel.innerText = 'Waiting for Approval';
-    window.location.href = "{{ url_for('main.staff_dashboard') }}"; // Redirect after stop
-}
+    timerInterval = null;
+  }
 
-// Pause reason box toggle
-function togglePauseBox(){
+  // Resume timer
+  function resumeTimer() {
+    if (!jobStart) jobStart = new Date();
+    if (!timerInterval) timerInterval = setInterval(updateTimer, 1000);
+    jobStatusLabel.innerText = 'In Progress';
+  }
+
+  // Toggle pause reason input
+  function togglePauseBox() {
     const box = document.getElementById('pauseReasonBox');
-    box.style.display = box.style.display==='none' ? 'block':'none';
-}
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  }
 
-// Initialize current time
-const currentTimeSpan = document.getElementById('currentTime');
-setInterval(()=>{
+  // Update current time display
+  const currentTimeSpan = document.getElementById('currentTime');
+  setInterval(() => {
     currentTimeSpan.innerText = new Date().toLocaleTimeString();
-},1000);
+  }, 1000);
 
-// Auto start timer if already running
-if(["Running","In Progress"].includes("{{ job.status }}")){
-    startTimer();
-}
+  // Auto-start timer if job already running
+  if (["Running", "In Progress"].includes("{{ job.status }}")) {
+    resumeTimer();
+  }
 
-// Initial update
-updateTimer();
+  // Initial update
+  updateTimer();
 </script>
 {% endblock %}

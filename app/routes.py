@@ -2,8 +2,7 @@
 from flask import (Blueprint, render_template, redirect, url_for, request,
                    flash, send_from_directory, jsonify, abort)
 # importing models.py
-from app.models import (User, Customer, Technician, Job, PauseLog,
-                        JobsDone, ShiftLog, PushSubscription)
+from app.models import (User, Customer, Technician, Shift, Job, PauseLog, PushSubscription)
 # flask login imports
 from flask_login import login_user, logout_user, login_required, current_user
 # werkzeug security for password hashing
@@ -131,101 +130,75 @@ def customers():
     return render_template('customers.html', customers=customers)
 
 
-# Add a new customer
 @main.route('/add_customer', methods=['GET', 'POST'])
-@login_required
 def add_customer():
-    if current_user.role == 'reception':
-        flash("Access denied. Reception users can only access dashboard.",
-              "error")
-        return redirect(url_for('main.shift_dashboard'))
-
     if request.method == 'POST':
-        name = request.form.get('name')
+        full_name = request.form.get('full_name')
         phone = request.form.get('phone')
-        email = request.form.get('email') or None
-        address = request.form.get('address') or None
+        email = request.form.get('email')
 
-        if not name or not phone:
-            flash("Name and phone are required.", "warning")
+        # Validate required fields
+        if not full_name or not phone:
+            flash('Full Name and Phone are required', 'danger')
             return redirect(url_for('main.add_customer'))
 
-        existing_customer = Customer.query.filter(
-            (Customer.name == name) | (Customer.phone == phone)
-        ).first()
-
-        if existing_customer:
-            if existing_customer.name == name:
-                flash("A customer with this name already exists.", "error")
-            elif email and existing_customer.phone == phone:
-                flash("A customer with this phone number already exists.",
-                      "error")
-            return redirect(url_for('main.add_customer'))
-
+        # Create and add the customer
         new_customer = Customer(
-            name=name,
+            full_name=full_name,
             phone=phone,
-            email=email or "Not Provided",
-            address=address or "Not Provided"
+            email=email
         )
         db.session.add(new_customer)
         db.session.commit()
-
-        flash("Customer added successfully.", "success")
+        flash(f'Customer "{full_name}" added successfully!', 'success')
         return redirect(url_for('main.customers'))
 
     return render_template('add_customer.html')
 
 
-# Edit an existing customer
-@main.route('/edit_customer/<int:id>', methods=['GET', 'POST'])
-@login_required
-def edit_customer(id):
-    if current_user.role == 'reception':
-        flash("Access denied. Reception users can only access dashboard.",
-              "error")
-        return redirect(url_for('main.shift_dashboard'))
-
-    customer = Customer.query.get_or_404(id)
+# ==========================
+# Edit Customer Route
+# ==========================
+@main.route('/edit_customer/<int:customer_id>', methods=['GET', 'POST'])
+def edit_customer(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
 
     if request.method == 'POST':
-        customer.name = request.form.get('name')
-        customer.phone = request.form.get('phone')
-        customer.email = request.form.get('email')
-        customer.address = request.form.get('address')
+        full_name = request.form.get('full_name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
 
-        if not customer.name or not customer.phone:
-            flash("Name and phone are required.", "warning")
-            return redirect(url_for('main.edit_customer', id=id))
+        if not full_name or not phone:
+            flash('Full Name and Phone are required', 'danger')
+            return redirect(url_for('main.edit_customer',
+                            customer_id=customer_id))
+
+        # Update customer
+        customer.full_name = full_name
+        customer.phone = phone
+        customer.email = email
 
         db.session.commit()
-        flash("Customer updated successfully.", "success")
+        flash(f'Customer "{full_name}" updated successfully!', 'success')
         return redirect(url_for('main.customers'))
 
     return render_template('edit_customer.html', customer=customer)
 
 
-# Delete a customer
-@main.route('/delete_customer/<int:id>', methods=['POST'])
+@main.route('/customers/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_customer(id):
-    if current_user.role == 'reception':
-        flash("Access denied. Reception users can only access dashboard.",
-              "error")
-        return redirect(url_for('main.shift_dashboard'))
-
     customer = Customer.query.get_or_404(id)
     db.session.delete(customer)
     db.session.commit()
-
-    flash("Customer deleted successfully.", "success")
+    flash('Customer deleted successfully.', 'success')
     return redirect(url_for('main.customers'))
 
 
 # ------------------- TECHNICIAN MANAGEMENT -------------------
-
-
+# -------------------------
 # List all technicians
+# -------------------------
 @main.route('/technicians')
 @login_required
 def technicians():
@@ -238,7 +211,9 @@ def technicians():
     return render_template('technicians.html', technicians=technicians)
 
 
+# -------------------------
 # Add a new technician
+# -------------------------
 @main.route('/add_technician', methods=['GET', 'POST'])
 @login_required
 def add_technician():
@@ -250,26 +225,27 @@ def add_technician():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        role = request.form.get('role')
+        email = request.form.get('email')
         name = request.form.get('name')
         phone = request.form.get('phone')
         specialization = request.form.get('specialization')
+        role = request.form.get('role')
 
         if not username or not password or not role or not name:
             flash("All required fields must be filled.", "warning")
             return redirect(url_for('main.add_technician'))
 
+        if not email:
+            email = 'Not Provided'
+
         try:
-            # Create the User
-            new_user = User(
-                username=username,
-                role=role
-            )
+            # Create the User first
+            new_user = User(username=username, email=email, role=role)
             new_user.set_password(password)
             db.session.add(new_user)
-            db.session.flush()  # get new_user.id
+            db.session.flush()
 
-            # Create the Technician
+            # Create the Technician linked to the User
             new_technician = Technician(
                 name=name,
                 phone=phone,
@@ -287,45 +263,70 @@ def add_technician():
             if "user.username" in str(e.orig):
                 flash("Username already exists. Please choose another.",
                       "error")
+            elif "user.email" in str(e.orig):
+                flash("Email already exists. Please choose another.", "error")
             else:
-                flash("Error adding technician.", "error")
+                flash(f"Error adding technician: {str(e)}", "error")
             return redirect(url_for('main.add_technician'))
 
     return render_template('add_technician.html')
 
 
-# Edit an existing technician
+# -------------------------
+# Edit technician
+# -------------------------
 @main.route('/edit_technician/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_technician(id):
     if current_user.role == 'reception':
-        flash("Access denied. Reception users can only access dashboard.",
-              "error")
+        flash("Access denied. Reception users can only access dashboard.", "error")
         return redirect(url_for('main.shift_dashboard'))
 
     tech = Technician.query.get_or_404(id)
 
     if request.method == 'POST':
-        tech.name = request.form.get('name')
-        tech.phone = request.form.get('phone')
-        tech.specialization = request.form.get('specialization')
-
-        # Update user role
-        tech.user.role = request.form.get('role')
-
-        # Update password if provided
+        username = request.form.get('username')
         new_password = request.form.get('password')
+        email = request.form.get('email')
+        tech.user.email = email.strip() if email and email.strip() else None
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        specialization = request.form.get('specialization')
+        role = request.form.get('role')
+
+        # Update user info
+        tech.user.username = username
+        tech.user.role = role
+        tech.user.email = email.strip() if email and email.strip() else None  # optional
+
         if new_password:
             tech.user.set_password(new_password)
 
-        db.session.commit()
-        flash("Technician updated successfully.", "success")
+        # Update technician info
+        tech.name = name
+        tech.phone = phone
+        tech.specialization = specialization
+
+        try:
+            db.session.commit()
+            flash("Technician updated successfully.", "success")
+        except IntegrityError as e:
+            db.session.rollback()
+            if "user.username" in str(e.orig):
+                flash("Username already exists. Please choose another.", "error")
+            elif "user.email" in str(e.orig):
+                flash("Email already exists. Please choose another.", "error")
+            else:
+                flash("Error updating technician.", "error")
+
         return redirect(url_for('main.technicians'))
 
-    return render_template('edit_technician.html', tech=tech)
+    return render_template('edit_technician.html', technician=tech)
 
 
-# Delete a technician
+# -------------------------
+# Delete technician
+# -------------------------
 @main.route('/delete_technician/<int:id>', methods=['POST'])
 @login_required
 def delete_technician(id):
@@ -348,7 +349,6 @@ def delete_technician(id):
 
 
 # ------------------- JOB MANAGEMENT -------------------
-
 # List all jobs
 @main.route('/jobs')
 @login_required
@@ -362,92 +362,73 @@ def jobs():
     return render_template('jobs.html', jobs=jobs)
 
 
-# Add a new job
 @main.route('/add_job', methods=['GET', 'POST'])
 @login_required
 def add_job():
-    """Add a new job."""
     if current_user.role == 'reception':
         flash("Access denied. Reception users can only access dashboard.",
               "error")
         return redirect(url_for('main.shift_dashboard'))
 
+    customers = Customer.query.all()
+    technicians = Technician.query.all()
+
     if request.method == 'POST':
         # Get form data
-        vehicle_registration = request.form.get('vehicle_registration')
         job_description = request.form.get('description')
         start_date_str = request.form.get('start_date')
         end_date_str = request.form.get('end_date')
+        target_days = int(request.form.get('target_days', 0))
         target_hours = int(request.form.get('target_hours', 0))
         target_minutes = int(request.form.get('target_minutes', 0))
         status = request.form.get('status')
         customer_id = request.form.get('customer_id')
         technician_id = request.form.get('technician_id')
-        vehicle_make = request.form.get('vehicle_make')
-        vehicle_model = request.form.get('vehicle_model')
-        vehicle_year = request.form.get('vehicle_year')
-        vehicle_color = request.form.get('vehicle_color')
-        total_cost_str = request.form.get('total_cost')
-        notes = request.form.get('notes')
 
-        # Required fields check
-        if any(not x for x in [vehicle_registration, job_description,
-                               customer_id, technician_id]):
-            flash("Vehicle registration and description are required.",
+        # Required check
+        if not job_description or not customer_id or not technician_id:
+            flash("Job description, customer, and technician are required.",
                   "warning")
             return redirect(url_for('main.add_job'))
 
-        # Convert dates from string to Python date objects
-        start_date = (
-            datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            if start_date_str else None
-        )
-        end_date = (
-            datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            if end_date_str else None
-        )
-#
-        try:
-            total_cost = float(total_cost_str) if total_cost_str else 0.0
-        except ValueError:
-            flash("Invalid total cost.", "warning")
-            return redirect(url_for('main.add_job'))
+        # Convert dates
+        start_time = datetime.strptime(start_date_str,
+                                       '%Y-%m-%d') if start_date_str else None
+        end_time = datetime.strptime(end_date_str,
+                                     '%Y-%m-%d') if end_date_str else None
 
-        # Convert target duration to total minutes
-        total_duration_minutes = target_hours * 60 + target_minutes
+        # Total duration in minutes
+        total_duration = target_days*24*60 + target_hours*60 + target_minutes
 
-        # Create Job object
+        technician_id = request.form.get('technician_id')
+
         new_job = Job(
-            vehicle_registration=vehicle_registration,
             job_description=job_description,
-            start_date=start_date,
-            end_date=end_date,
-            target_duration=total_duration_minutes,
+            start_time=start_time,
+            end_time=end_time,
+            target_duration=total_duration,
             status=status or 'Pending',
             customer_id=customer_id,
-            technician_id=technician_id,
-            vehicle_make=vehicle_make,
-            vehicle_model=vehicle_model,
-            vehicle_year=vehicle_year,
-            vehicle_color=vehicle_color,
-            total_cost=total_cost,
-            accepted=False,
-            notes=notes
+            technician_id=technician_id,  # <-- correct column
+            vehicle_registration=request.form.get('vehicle_registration'),
+            vehicle_make=request.form.get('vehicle_make'),
+            vehicle_model=request.form.get('vehicle_model'),
+            vehicle_year=request.form.get('vehicle_year'),
+            vehicle_color=request.form.get('vehicle_color'),
+            total_cost=request.form.get('total_cost') or 0.0,
+            notes=request.form.get('notes')
         )
+
 
         db.session.add(new_job)
         db.session.commit()
-
         flash("Job added successfully.", "success")
         return redirect(url_for('main.jobs'))
 
-    customers = Customer.query.all()
-    technicians = Technician.query.all()
     return render_template('add_job.html', customers=customers,
                            technicians=technicians)
 
 
-# Edit an existing job
 @main.route('/edit_job/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_job(id):
@@ -457,69 +438,43 @@ def edit_job(id):
         return redirect(url_for('main.shift_dashboard'))
 
     job = Job.query.get_or_404(id)
+    customers = Customer.query.all()
+    technicians = Technician.query.all()
 
     if request.method == 'POST':
-        # Basic job info
-        job.vehicle_registration = request.form.get('vehicle_registration')
         job.job_description = request.form.get('description')
         job.customer_id = request.form.get('customer_id')
-        job.technician_id = request.form.get('technician_id')
+        job.assigned_technician_id = request.form.get('technician_id')
         job.status = request.form.get('status')
-
-        # Target duration (hours and minutes)
-        try:
-            target_hours = int(request.form.get('target_hours', 0))
-            target_minutes = int(request.form.get('target_minutes', 0))
-            job.target_duration = target_hours * 60 + target_minutes
-        except ValueError:
-            job.target_duration = 0
 
         # Dates
         start_date_str = request.form.get('start_date')
         end_date_str = request.form.get('end_date')
+        job.start_time = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
+        job.end_time = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
 
-        job.start_date = (
-            datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            if start_date_str else None
-        )
-
-        job.end_date = (
-            datetime.strptime(end_date_str, '%Y-%m-%d').date()
-            if end_date_str else None
-        )
-
-        # Vehicle details
-        job.vehicle_make = request.form.get('vehicle_make')
-        job.vehicle_model = request.form.get('vehicle_model')
-        job.vehicle_year = request.form.get('vehicle_year')
-        job.vehicle_color = request.form.get('vehicle_color')
-
-        # Total cost
-        try:
-            job.total_cost = float(request.form.get('total_cost', 0))
-        except ValueError:
-            job.total_cost = 0.0
-
-        # Notes
-        job.notes = request.form.get('notes')
+        # Target duration
+        target_days = int(request.form.get('target_days', 0))
+        target_hours = int(request.form.get('target_hours', 0))
+        target_minutes = int(request.form.get('target_minutes', 0))
+        job.target_duration = target_days*24*60 + target_hours*60 + target_minutes
 
         db.session.commit()
         flash("Job updated successfully.", "success")
         return redirect(url_for('main.jobs'))
 
-    # GET request: precompute hours and minutes for dropdowns
-    total_minutes = int(job.target_duration) if job.target_duration else 0
-    target_hours = total_minutes // 60
+    # Precompute days, hours, minutes for dropdowns
+    total_minutes = job.target_duration or 0
+    target_days = total_minutes // (24*60)
+    target_hours = (total_minutes % (24*60)) // 60
     target_minutes = total_minutes % 60
-
-    customers = Customer.query.all()
-    technicians = Technician.query.all()
 
     return render_template(
         'edit_job.html',
         job=job,
         customers=customers,
         technicians=technicians,
+        target_days=target_days,
         target_hours=target_hours,
         target_minutes=target_minutes
     )
@@ -605,7 +560,6 @@ def start_job(job_id):
         job.start_time = datetime.now()
     job.status = "Running"
     db.session.commit()
-
     flash("Job started.", "success")
     return redirect(url_for('main.job_control', job_id=job.id))
 
@@ -619,15 +573,17 @@ def pause_job(job_id):
         return redirect(url_for('main.staff_dashboard'))
 
     now = datetime.now()
-    # Update total_work_duration
+    # Add elapsed time since start to total_work_duration
     if job.start_time:
         delta = (now - job.start_time).total_seconds()
         job.total_work_duration += int(delta)
-    job.start_time = now  # record start time for resume
-    pause_reason = request.form.get("reason", "No reason")
-    pause = PauseLog(job_id=job.id, paused_at=now, timer_value=job.total_work_duration, reason=pause_reason)
+
+    pause_reason = request.form.get("reason", "No reason provided")
+    pause = PauseLog(job_id=job.id, pause_start=now, reason=pause_reason)
     db.session.add(pause)
+
     job.status = "Paused"
+    job.start_time = None  # stop current active timer
     db.session.commit()
 
     flash("Job paused.", "warning")
@@ -642,18 +598,14 @@ def resume_job(job_id):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
 
-    job.start_time = datetime.now()  # new start point
+    job.start_time = datetime.now()
     job.status = "In Progress"
-
-    # Update last pause with resume time
-    pause = PauseLog.query.filter_by(job_id=job.id, resumed_at=None).order_by(PauseLog.paused_at.desc()).first()
-    if pause:
-        pause.resumed_at = datetime.now()
     db.session.commit()
     flash("Job resumed.", "success")
     return redirect(url_for('main.job_control', job_id=job.id))
 
 
+# Stop a job
 @main.route('/stop_job/<int:job_id>', methods=['POST'])
 @login_required
 def stop_job(job_id):
@@ -662,18 +614,17 @@ def stop_job(job_id):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
 
-    # update total elapsed
+    # Update pause logs if job was running
     if job.start_time:
-        job.total_work_duration += int((datetime.now() - job.start_time).total_seconds())
+        last_pause = PauseLog.query.filter_by(job_id=job.id, pause_end=None).order_by(PauseLog.pause_start.desc()).first()
+        if last_pause:
+            last_pause.pause_end = datetime.now()
+
     job.start_time = None
     job.status = "Waiting for Approval"
     db.session.commit()
-
     flash("Good job! You have completed the job.", "success")
     return redirect(url_for('main.staff_jobs', tech_id=job.technician.id))
-
-
-
 # ------------------- JOB APPROVAL WORKFLOW -------------------
 
 
@@ -702,23 +653,17 @@ def approve_job(job_id):
         return redirect(url_for('main.staff_dashboard'))
 
     job = Job.query.get_or_404(job_id)
+
     if job.status == 'Waiting for Approval':
-        job_done = JobsDone(
-            job_id=job.id,
-            vehicle_registration=job.vehicle_registration,
-            description=job.description,
-            start_time=job.start_time,
-            end_time=job.end_time,
-            total_work_duration=job.total_work_duration,
-            customer_name=job.customer.name,
-            technician_name=job.technician.name,
-            pause_summary="\n".join([
-                f"{p.paused_at} - {p.resumed_at or 'Still Paused'}: {p.reason}"
-                for p in job.pauses
-            ])
-        )
-        db.session.add(job_done)
+        # Mark the job as completed
         job.status = 'Completed'
+
+        pause_summary = "\n".join([
+            f"{p.pause_start} - {p.pause_end or 'Still Paused'}"
+            for p in job.pause_logs
+        ])
+        job.notes = (job.notes or '') + f"\nPause Summary:\n{pause_summary}"
+
         db.session.commit()
         flash('Job approved and marked as completed.', 'success')
 
@@ -791,58 +736,79 @@ def log_shift(tech_id):
 
     technician = Technician.query.get_or_404(tech_id)
     today = date.today()
-    shift = ShiftLog.query.filter_by(technician_id=tech_id, date=today).first()
+
+    # Get today's shift
+    shift = Shift.query.filter(
+        Shift.technician_id == tech_id,
+        db.func.date(Shift.start_time) == today
+    ).first()
 
     if request.method == 'POST':
         # Start shift
         if not shift:
-            start_time = datetime.now().time()
-            shift = ShiftLog(technician_id=tech_id, date=today,
-                             start_time=start_time)
+            shift = Shift(
+                technician_id=tech_id,
+                start_time=datetime.now()
+            )
             db.session.add(shift)
             db.session.commit()
             flash("Arrival time logged successfully.", "success")
 
         # End shift
         elif not shift.end_time:
-            shift.end_time = datetime.now().time()
+            shift.end_time = datetime.now()
             db.session.commit()
             flash("Departure time logged successfully.", "success")
 
         return redirect(url_for('main.shift_dashboard'))
 
-    return render_template('log_shift.html', technician=technician,
-                           shift=shift)
+    return render_template('log_shift.html',
+                           technician=technician, shift=shift)
 
 
 # ------------------- WEEKLY SUMMARY PDF -------------------
+
+@main.route('/weekly_summary')
+@login_required
+def weekly_summary_dashboard():
+    if current_user.role != 'admin':
+        flash("Access denied. Admins only.", "error")
+        return redirect(url_for('main.staff_dashboard'))
+
+    # fetch all technicians
+    techs = Technician.query.all()  # <-- variable name matches template
+
+    return render_template('weekly_summary_dashboard.html', techs=techs)
+
 
 # Generate weekly summary PDF for a technician
 @main.route('/generate_weekly_summary/<int:tech_id>', methods=['POST'])
 @login_required
 def generate_weekly_summary(tech_id):
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         flash("Access denied. Admins only.", "error")
-        return redirect(url_for('main.admin_dashboard'))
+        return redirect(url_for('main.staff_dashboard'))
 
     technician = Technician.query.get_or_404(tech_id)
     week_start = date.today()
     week_end = week_start + timedelta(days=6)
 
-    shifts = ShiftLog.query.filter(
-        ShiftLog.technician_id == tech_id,
-        ShiftLog.date >= week_start,
-        ShiftLog.date <= week_end
+    # Get shifts for the week
+    shifts = Shift.query.filter(
+        Shift.technician_id == tech_id,
+        db.func.date(Shift.start_time) >= week_start,
+        db.func.date(Shift.start_time) <= week_end
     ).all()
 
-    jobs = JobsDone.query.filter(
-        JobsDone.technician_name == technician.name,
-        JobsDone.start_time >= week_start,
-        JobsDone.start_time <= week_end
+    # Get jobs completed in the week
+    jobs = Job.query.filter(
+        Job.technician_id == tech_id,
+        Job.start_time >= datetime.combine(week_start, datetime.min.time()),
+        Job.start_time <= datetime.combine(week_end, datetime.max.time())
     ).all()
 
-    filename = generate_weekly_summary_pdf(technician, week_start, week_end,
-                                           shifts, jobs)
+    filename = generate_weekly_summary_pdf(technician, week_start,
+                                           week_end, shifts, jobs)
 
     if not filename:
         flash("Could not generate weekly summary PDF.", "error")
@@ -851,19 +817,6 @@ def generate_weekly_summary(tech_id):
               "success")
 
     return redirect(url_for('main.weekly_summary_dashboard'))
-
-
-# View and download weekly summary PDFs
-@main.route('/weekly_summary_dashboard')
-@login_required
-def weekly_summary_dashboard():
-    if not current_user.is_admin:
-        flash("Access denied. Admins only.", "error")
-        return redirect(url_for('main.admin_dashboard'))
-
-    techs = Technician.query.all()
-    return render_template('weekly_summary_dashboard.html', techs=techs,
-                           get_pdfs_for_tech=get_pdfs_for_tech)
 
 
 # Download a specific PDF
@@ -878,7 +831,6 @@ def download_pdf(filename):
 
 
 # ------------------- PUSH NOTIFICATIONS -------------------
-
 # Serve the service worker JavaScript
 @main.route('/service-worker.js')
 def service_worker():
@@ -991,6 +943,17 @@ def live_jobs():
 
     jobs = Job.query.filter(Job.status.notin_(["Completed", "Declined"])).all()
     return render_template('live_jobs.html', jobs=jobs)
+
+
+# For live AJAX updates
+@main.route('/live_jobs_data')
+@login_required
+def live_jobs_data():
+    if current_user.role != 'admin':
+        return "Access denied", 403
+
+    jobs = Job.query.filter(Job.status.notin_(["Completed", "Declined"])).all()
+    return render_template('_live_jobs_table.html', jobs=jobs)
 
 
 # Admin actions on jobs

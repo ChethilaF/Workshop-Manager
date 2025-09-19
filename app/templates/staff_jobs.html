@@ -3,7 +3,9 @@
 {% block title %}My Jobs{% endblock %}
 
 {% block extra_css %}
+<!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Staff Jobs specific CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/staff_jobs.css') }}">
 {% endblock %}
 
@@ -14,25 +16,25 @@
 <ul class="jobs-list">
   {% for job in jobs %}
   <li class="job-card">
-    <div class="job-info">
-      <!-- Job description centered and bigger -->
-      <div class="job-description">
-        {{ job.job_description }}
-      </div>
 
-      <!-- Details with icons + dash -->
+    <!-- Job Description -->
+    <div class="job-info">
+      <div class="job-description" aria-label="Job description">{{ job.job_description }}</div>
+
+      <!-- Job Details -->
       <small><i class="fas fa-tasks"></i> Status - {{ job.status }}</small>
       <small><i class="fas fa-car"></i> Vehicle Rego - {{ job.vehicle_registration }}</small>
-      <small><i class="fas fa-car-side"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{ job.vehicle_year }}</small>
+      <small><i class="fas fa-car-side"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{
+        job.vehicle_year }}</small>
       <small>
-        <i class="fas fa-clock"></i> Target Duration - 
+        <i class="fas fa-clock"></i> Target Duration -
         {% if job.target_duration %}
-            {% set duration = job.target_duration|int %}
-            {% set h = duration // 60 %}
-            {% set m = duration % 60 %}
-            {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
+        {% set duration = job.target_duration|int %}
+        {% set h = duration // 60 %}
+        {% set m = duration % 60 %}
+        {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
         {% else %}
-            N/A
+        N/A
         {% endif %}
       </small>
       <small><i class="fas fa-user"></i> Customer - {{ job.customer.name }}</small>
@@ -40,22 +42,39 @@
       <small><i class="fas fa-calendar-check"></i> End - {{ job.end_date or 'N/A' }}</small>
     </div>
 
+    <!-- Job Actions -->
     <div class="job-actions">
       {% if not job.accepted %}
+      <!-- Accept Job -->
       <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
-        <button type="submit" class="accept-button">
+        <button type="submit" class="accept-button" aria-label="Accept job {{ job.job_description }}">
           <i class="fas fa-check"></i> Accept
         </button>
       </form>
-      <a href="{{ url_for('main.staff_dashboard') }}" class="decline-button">
+
+      <!-- Decline Job -->
+      <a href="{{ url_for('main.staff_dashboard') }}" class="decline-button"
+        aria-label="Decline job {{ job.job_description }}">
         <i class="fas fa-times"></i> Decline
       </a>
+
       {% else %}
-      <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="control-button">
+      {% if job.status in ['Running', 'In Progress', 'Paused'] %}
+      <!-- Enter Job Control -->
+      <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="control-button"
+        aria-label="Control job {{ job.job_description }}">
         <i class="fas fa-cogs"></i> Enter Control
       </a>
+      {% else %}
+      <!-- Job Locked / Sent for Approval -->
+      <button class="control-button disabled" disabled aria-label="Job {{ job.job_description }} locked">
+        <i class="fas fa-lock"></i> Job Locked
+      </button>
+      {% endif %}
       {% endif %}
     </div>
+
+
   </li>
   {% endfor %}
 </ul>

@@ -24,27 +24,35 @@
 
       <!-- Start & End Date -->
       <div class="input-group">
-        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
+        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date</label>
         <input type="date" id="start_date" name="start_date">
       </div>
       <div class="input-group">
-        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
+        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date</label>
         <input type="date" id="end_date" name="end_date">
       </div>
 
-      <!-- Target duration -->
       <div class="input-group">
-        <label><i class="fas fa-clock"></i> Target Duration:</label>
+        <label><i class="fas fa-clock"></i> Target Duration</label>
         <div class="duration-selects">
+          <select name="target_days">
+            {% for d in range(0, 365) %}
+            <option value="{{ d }}" {% if job and target_days==d %}selected{% endif %}>
+              {{ d }} day{% if d != 1 %}s{% endif %}
+            </option>
+            {% endfor %}
+          </select>
+
           <select name="target_hours">
-            {% for h in range(0, 13) %}
+            {% for h in range(0, 24) %}
             <option value="{{ h }}" {% if job and target_hours==h %}selected{% endif %}>
               {{ h }} hr{% if h != 1 %}s{% endif %}
             </option>
             {% endfor %}
           </select>
+
           <select name="target_minutes">
-            {% for m in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] %}
+            {% for m in [0,5,10,15,20,25,30,35,40,45,50,55,60] %}
             <option value="{{ m }}" {% if job and target_minutes==m %}selected{% endif %}>
               {{ m }} min
             </option>
@@ -53,9 +61,10 @@
         </div>
       </div>
 
+
       <!-- Status -->
       <div class="input-group">
-        <label for="status"><i class="fas fa-tasks"></i> Status:</label>
+        <label for="status"><i class="fas fa-tasks"></i> Status</label>
         <select id="status" name="status">
           <option value="Pending" selected>Pending</option>
           <option value="In Progress">In Progress</option>
@@ -65,53 +74,54 @@
 
       <!-- Customer & Technician -->
       <div class="input-group">
-        <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
-        <select id="customer_id" name="customer_id">
+        <label for="customer_id"><i class="fas fa-user"></i> Customer</label>
+        <select id="customer_id" name="customer_id" required>
           {% for customer in customers %}
-          <option value="{{ customer.id }}">{{ customer.name }}</option>
+          <option value="{{ customer.id }}">{{ customer.full_name }}</option>
           {% endfor %}
         </select>
       </div>
+
       <div class="input-group">
-        <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
-        <select id="technician_id" name="technician_id">
+        <label for="technician_id">Assign Technician</label>
+        <select id="technician_id" name="technician_id" required>
+          <option value="" disabled selected>Select a Technician</option>
           {% for tech in technicians %}
           <option value="{{ tech.id }}">{{ tech.name }}</option>
           {% endfor %}
         </select>
       </div>
 
-      <!-- Vehicle Details -->
+
+      <!-- Vehicle details -->
       <div class="input-group">
-        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration:</label>
-        <input type="text" id="vehicle_registration" name="vehicle_registration">
+        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration</label>
+        <input type="text" id="vehicle_registration" name="vehicle_registration" required>
       </div>
       <div class="input-group">
-        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make:</label>
+        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make</label>
         <input type="text" id="vehicle_make" name="vehicle_make">
       </div>
       <div class="input-group">
-        <label for="vehicle_model"><i class="fas fa-car"></i> Vehicle Model:</label>
+        <label for="vehicle_model"><i class="fas fa-car-side"></i> Vehicle Model</label>
         <input type="text" id="vehicle_model" name="vehicle_model">
       </div>
       <div class="input-group">
-        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year:</label>
+        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year</label>
         <input type="number" id="vehicle_year" name="vehicle_year">
       </div>
       <div class="input-group">
-        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color:</label>
+        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color</label>
         <input type="text" id="vehicle_color" name="vehicle_color">
       </div>
 
-      <!-- Cost -->
+      <!-- Cost & Notes -->
       <div class="input-group">
-        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost:</label>
+        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost</label>
         <input type="number" id="total_cost" name="total_cost" step="0.01">
       </div>
-
-      <!-- Notes -->
       <div class="input-group">
-        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes:</label>
+        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes</label>
         <textarea id="notes" name="notes"></textarea>
       </div>
 

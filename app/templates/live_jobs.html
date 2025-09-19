@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Live Jobs{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/live_jobs.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<h2>Live Jobs</h2>
+
+<div id="jobs-container" class="jobs-container">
+    <!-- Jobs table will be injected here via JS -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function fetchLiveJobs() {
+    try {
+        const response = await fetch("{{ url_for('main.live_jobs_data') }}");
+        const html = await response.text();
+        document.getElementById("jobs-container").innerHTML = html;
+    } catch (err) {
+        console.error("Error fetching live jobs:", err);
+    }
+}
+
+// Initial load
+fetchLiveJobs();
+
+// Refresh every 5 seconds
+setInterval(fetchLiveJobs, 5000);
+</script>
+{% endblock %}

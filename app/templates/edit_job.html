@@ -14,45 +14,48 @@
     <a href="{{ url_for('main.jobs') }}" class="back-button">
       <i class="fas fa-arrow-left"></i> Back
     </a>
-    
-    <!-- Edit Job form -->
 
     <form method="POST">
       <!-- Job description -->
       <div class="input-group">
         <label for="description"><i class="fas fa-briefcase"></i> Job Description</label>
-        <input type="text" id="description" name="description" placeholder="Job description" required
-          value="{{ job.job_description }}">
+        <input type="text" id="description" name="description" required
+               value="{{ request.form.get('description', job.job_description) }}">
       </div>
 
-      <!-- Start date -->
+      <!-- Start & End Date -->
       <div class="input-group">
-        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date:</label>
+        <label for="start_date"><i class="fas fa-calendar-alt"></i> Start Date</label>
         <input type="date" id="start_date" name="start_date"
-          value="{{ job.start_date.strftime('%Y-%m-%d') if job.start_date else '' }}">
+               value="{{ request.form.get('start_date', job.start_time.strftime('%Y-%m-%d') if job.start_time else '') }}">
       </div>
-
-      <!-- End date -->
       <div class="input-group">
-        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date:</label>
+        <label for="end_date"><i class="fas fa-calendar-check"></i> End Date</label>
         <input type="date" id="end_date" name="end_date"
-          value="{{ job.end_date.strftime('%Y-%m-%d') if job.end_date else '' }}">
+               value="{{ request.form.get('end_date', job.end_time.strftime('%Y-%m-%d') if job.end_time else '') }}">
       </div>
 
-      <!-- Target duration -->
+      <!-- Target Duration -->
       <div class="input-group">
-        <label><i class="fas fa-clock"></i> Target Duration:</label>
+        <label><i class="fas fa-clock"></i> Target Duration</label>
         <div class="duration-selects">
+          <select name="target_days">
+            {% for d in range(0, 365) %}
+            <option value="{{ d }}" {% if request.form.get('target_days')|int==d or (not request.form.get('target_days') and target_days==d) %}selected{% endif %}>
+              {{ d }} day{% if d != 1 %}s{% endif %}
+            </option>
+            {% endfor %}
+          </select>
           <select name="target_hours">
-            {% for h in range(0, 13) %}
-            <option value="{{ h }}" {% if job and target_hours==h %}selected{% endif %}>
+            {% for h in range(0, 24) %}
+            <option value="{{ h }}" {% if request.form.get('target_hours')|int==h or (not request.form.get('target_hours') and target_hours==h) %}selected{% endif %}>
               {{ h }} hr{% if h != 1 %}s{% endif %}
             </option>
             {% endfor %}
           </select>
           <select name="target_minutes">
-            {% for m in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] %}
-            <option value="{{ m }}" {% if job and target_minutes==m %}selected{% endif %}>
+            {% for m in [0,5,10,15,20,25,30,35,40,45,50,55,60] %}
+            <option value="{{ m }}" {% if request.form.get('target_minutes')|int==m or (not request.form.get('target_minutes') and target_minutes==m) %}selected{% endif %}>
               {{ m }} min
             </option>
             {% endfor %}
@@ -62,70 +65,69 @@
 
       <!-- Status -->
       <div class="input-group">
-        <label for="status"><i class="fas fa-tasks"></i> Status:</label>
+        <label for="status"><i class="fas fa-tasks"></i> Status</label>
         <select id="status" name="status">
-          {% for s in ['Pending','In Progress','Completed'] %}
-          <option value="{{ s }}" {% if job.status==s %}selected{% endif %}>{{ s }}</option>
-          {% endfor %}
+          <option value="Pending" {% if request.form.get('status', job.status)=='Pending' %}selected{% endif %}>Pending</option>
+          <option value="In Progress" {% if request.form.get('status', job.status)=='In Progress' %}selected{% endif %}>In Progress</option>
+          <option value="Completed" {% if request.form.get('status', job.status)=='Completed' %}selected{% endif %}>Completed</option>
         </select>
       </div>
 
-      <!-- Customer -->
+      <!-- Customer & Technician -->
       <div class="input-group">
-        <label for="customer_id"><i class="fas fa-user"></i> Customer:</label>
-        <select id="customer_id" name="customer_id">
+        <label for="customer_id"><i class="fas fa-user"></i> Customer</label>
+        <select id="customer_id" name="customer_id" required>
           {% for customer in customers %}
-          <option value="{{ customer.id }}" {% if job.customer_id==customer.id %}selected{% endif %}>{{ customer.name }}
+          <option value="{{ customer.id }}" {% if request.form.get('customer_id')|int==customer.id or (not request.form.get('customer_id') and customer.id==job.customer_id) %}selected{% endif %}>
+            {{ customer.full_name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="technician_id"><i class="fas fa-wrench"></i> Technician</label>
+        <select id="technician_id" name="technician_id" required>
+          {% for tech in technicians %}
+          <option value="{{ tech.id }}" {% if request.form.get('technician_id')|int==tech.id or (not request.form.get('technician_id') and tech.id==job.assigned_technician_id) %}selected{% endif %}>
+            {{ tech.full_name }}
           </option>
           {% endfor %}
         </select>
       </div>
 
-      <!-- Technician -->
+      <!-- Vehicle details -->
       <div class="input-group">
-        <label for="technician_id"><i class="fas fa-wrench"></i> Technician:</label>
-        <select id="technician_id" name="technician_id">
-          {% for tech in technicians %}
-          <option value="{{ tech.id }}" {% if job.technician_id==tech.id %}selected{% endif %}>{{ tech.name }}</option>
-          {% endfor %}
-        </select>
+        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration</label>
+        <input type="text" id="vehicle_registration" name="vehicle_registration" required
+               value="{{ request.form.get('vehicle_registration', job.vehicle_registration) }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make</label>
+        <input type="text" id="vehicle_make" name="vehicle_make" value="{{ request.form.get('vehicle_make', job.vehicle_make) }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_model"><i class="fas fa-car-side"></i> Vehicle Model</label>
+        <input type="text" id="vehicle_model" name="vehicle_model" value="{{ request.form.get('vehicle_model', job.vehicle_model) }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year</label>
+        <input type="number" id="vehicle_year" name="vehicle_year" value="{{ request.form.get('vehicle_year', job.vehicle_year) }}">
+      </div>
+      <div class="input-group">
+        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color</label>
+        <input type="text" id="vehicle_color" name="vehicle_color" value="{{ request.form.get('vehicle_color', job.vehicle_color) }}">
       </div>
 
-      <!-- Vehicle Details -->
+      <!-- Cost & Notes -->
       <div class="input-group">
-        <label for="vehicle_registration"><i class="fas fa-car"></i> Vehicle Registration:</label>
-        <input type="text" id="vehicle_registration" name="vehicle_registration" value="{{ job.vehicle_registration }}">
+        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost</label>
+        <input type="number" id="total_cost" name="total_cost" step="0.01" value="{{ request.form.get('total_cost', job.total_cost) }}">
       </div>
       <div class="input-group">
-        <label for="vehicle_make"><i class="fas fa-car-side"></i> Vehicle Make:</label>
-        <input type="text" id="vehicle_make" name="vehicle_make" value="{{ job.vehicle_make }}">
-      </div>
-      <div class="input-group">
-        <label for="vehicle_model"><i class="fas fa-car"></i> Vehicle Model:</label>
-        <input type="text" id="vehicle_model" name="vehicle_model" value="{{ job.vehicle_model }}">
-      </div>
-      <div class="input-group">
-        <label for="vehicle_year"><i class="fas fa-calendar"></i> Vehicle Year:</label>
-        <input type="number" id="vehicle_year" name="vehicle_year" value="{{ job.vehicle_year }}">
-      </div>
-      <div class="input-group">
-        <label for="vehicle_color"><i class="fas fa-paint-brush"></i> Vehicle Color:</label>
-        <input type="text" id="vehicle_color" name="vehicle_color" value="{{ job.vehicle_color }}">
+        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes</label>
+        <textarea id="notes" name="notes">{{ request.form.get('notes', job.notes) }}</textarea>
       </div>
 
-      <!-- Cost -->
-      <div class="input-group">
-        <label for="total_cost"><i class="fas fa-dollar-sign"></i> Total Cost:</label>
-        <input type="number" id="total_cost" name="total_cost" step="0.01" value="{{ job.total_cost }}">
-      </div>
-
-      <!-- Notes -->
-      <div class="input-group">
-        <label for="notes"><i class="fas fa-info-circle"></i> Additional Notes:</label>
-        <textarea id="notes" name="notes">{{ job.notes }}</textarea>
-      </div>
-
-      <!-- Submit button -->
       <button type="submit" class="submit-button">Update Job</button>
     </form>
   </div>

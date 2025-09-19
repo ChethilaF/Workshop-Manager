@@ -3,9 +3,11 @@
 
 {% block extra_css %}
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <!-- Page-specific CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/customers.css') }}">
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/customers.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -14,7 +16,9 @@
 {% if current_user.role == 'admin' %}
 <!-- Admin-only action bar for adding new customers -->
 <div class="action-bar">
-  <a href="{{ url_for('main.add_customer') }}" class="add-customer-btn" aria-label="Add a new customer">
+  <a href="{{ url_for('main.add_customer') }}"
+     class="add-customer-btn"
+     aria-label="Add a new customer">
     <i class="fas fa-user-plus"></i> Add New Customer
   </a>
 </div>
@@ -24,24 +28,33 @@
 {% if customers %}
 <ul class="customer-list">
   {% for customer in customers %}
-  <li class="customer-item" tabindex="0" aria-label="Customer {{ customer.name }}">
+  <li class="customer-item"
+      tabindex="0"
+      aria-label="Customer {{ customer.full_name }}">
+      
+    <!-- Customer info -->
     <div class="customer-info">
-      <span><strong>{{ customer.name }}</strong></span><br>
-      <small>| {{ customer.email }}</small>
-      <small>| {{ customer.phone }}</small>
-      <small>| {{ customer.address }} |</small>
+      <span><strong>{{ customer.full_name }}</strong></span><br>
+      {% if customer.email %}<small>| {{ customer.email }}</small>{% endif %}
+      {% if customer.phone %}<small>| {{ customer.phone }}</small>{% endif %}
+      {% if customer.address %}<small>| {{ customer.address }}</small>{% endif %}
     </div>
 
     {% if current_user.role == 'admin' %}
-    <!-- Admin-only actions for editing and deleting customers -->
+    <!-- Admin-only actions: Edit and Delete -->
     <div class="customer-actions">
-      <a href="{{ url_for('main.edit_customer', id=customer.id) }}" class="edit-button"
-        aria-label="Edit customer {{ customer.name }}">
+      <a href="{{ url_for('main.edit_customer', customer_id=customer.id) }}"
+         class="edit-button"
+         aria-label="Edit customer {{ customer.full_name }}">
         <i class="fas fa-edit"></i> Edit
       </a>
-      <form action="{{ url_for('main.delete_customer', id=customer.id) }}" method="POST" class="delete-form">
-        <button type="submit" onclick="return confirm('Are you sure you want to delete {{ customer.name }}?')"
-          class="delete-button" aria-label="Delete customer {{ customer.name }}">
+      <form action="{{ url_for('main.delete_customer', id=customer.id) }}"
+            method="POST"
+            class="delete-form">
+        <button type="submit"
+                onclick="return confirm('Are you sure you want to delete {{ customer.full_name }}?')"
+                class="delete-button"
+                aria-label="Delete customer {{ customer.full_name }}">
           <i class="fas fa-trash"></i> Delete
         </button>
       </form>
@@ -53,4 +66,5 @@
 {% else %}
 <p>No customers have been added. Please add a new customer to get started.</p>
 {% endif %}
+
 {% endblock %}

@@ -2,59 +2,49 @@
 {% block title %}Add Customer{% endblock %}
 
 {% block extra_css %}
-<!-- Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<!-- Page-specific CSS -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/customer_actions.css') }}">
 {% endblock %}
 
 {% block content %}
-
 <h2>Add New Customer</h2>
 
 <div class="body-content">
   <div class="customer-form-container">
-    <!-- Back button -->
-    <a href="{{ url_for('main.customers') }}" class="back-button">
+    <a href="{{ url_for('main.customers') }}" class="back-button" aria-label="Back to Customers">
       <i class="fas fa-arrow-left"></i> Back
     </a>
 
     <form method="POST">
-      <!-- CSRF token (if Flask-WTF is used) -->
       {% if csrf_token %}
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       {% endif %}
 
-      <!-- Name field -->
       <div class="input-group">
-        <label for="name"><i class="fas fa-user"></i> Full Name</label>
-        <input type="text" id="name" name="name" placeholder="Full Name" required aria-required="true" autofocus>
+        <label for="full_name"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Full Name" required autofocus>
       </div>
 
-      <!-- Phone field -->
       <div class="input-group">
         <label for="phone"><i class="fas fa-phone"></i> Phone</label>
-        <input type="text" id="phone" name="phone" placeholder="Phone" required aria-required="true"
-          pattern="^[0-9\-\+\s\(\)]{7,20}$"
-          title="Enter a valid phone number (digits, spaces, +, -, parentheses)">
+        <input type="text" id="phone" name="phone" placeholder="Phone" required
+               pattern="^[0-9\-\+\s\(\)]{7,20}$"
+               title="Enter a valid phone number (digits, spaces, +, -, parentheses)">
       </div>
 
-      <!-- Email field -->
       <div class="input-group">
         <label for="email"><i class="fas fa-envelope"></i> Email (optional)</label>
-        <input type="email" id="email" name="email" placeholder="Email (optional)" aria-label="Email (optional)">
+        <input type="email" id="email" name="email" placeholder="Email (optional)">
       </div>
 
-      <!-- Address field -->
       <div class="input-group">
         <label for="address"><i class="fas fa-map-marker-alt"></i> Address (optional)</label>
-        <input type="text" id="address" name="address" placeholder="Address (optional)" aria-label="Address (optional)">
+        <input type="text" id="address" name="address" placeholder="Address (optional)">
       </div>
 
-      <!-- Submit button -->
       <button type="submit" class="submit-button">Add Customer</button>
     </form>
-
   </div>
 </div>
 {% endblock %}

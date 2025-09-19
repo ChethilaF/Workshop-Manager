@@ -16,62 +16,57 @@
       <i class="fas fa-arrow-left"></i> Back
     </a>
 
-    <!-- Edit Technician form -->
-
+    <!-- Technician edit form -->
     <form method="POST">
       <!-- Username -->
       <div class="input-group">
-        <i class="fas fa-user-circle"></i>
-        <label for="username" class="sr-only">Username</label>
-        <input type="text" id="username" name="username" placeholder="Username"
-               value="{{ tech.user.username }}" required>
+        <label for="username"><i class="fas fa-user-circle"></i> Username</label>
+        <input type="text" id="username" name="username" required
+               value="{{ technician.user.username }}">
       </div>
 
       <!-- Password -->
       <div class="input-group">
-        <i class="fas fa-lock"></i>
-        <label for="password" class="sr-only">Password</label>
-        <input type="password" id="password" name="password" placeholder="Leave blank to keep current password">
+        <label for="password"><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="password" name="password" placeholder="Leave blank to keep current">
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+        <label for="email"><i class="fas fa-envelope"></i> Email (optional)</label>
+        <input type="email" id="email" name="email" value="{{ technician.email or '' }}">
       </div>
 
       <!-- Full Name -->
       <div class="input-group">
-        <i class="fas fa-user"></i>
-        <label for="name" class="sr-only">Full Name</label>
-        <input type="text" id="name" name="name" placeholder="Full Name"
-               value="{{ tech.name }}" required>
+        <label for="name"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="name" name="name" required value="{{ technician.name }}">
       </div>
 
       <!-- Phone -->
       <div class="input-group">
-        <i class="fas fa-phone"></i>
-        <label for="phone" class="sr-only">Phone</label>
-        <input type="text" id="phone" name="phone" placeholder="Phone"
-               value="{{ tech.phone }}">
+        <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+        <input type="text" id="phone" name="phone" value="{{ technician.phone }}">
       </div>
 
       <!-- Specialization -->
       <div class="input-group">
-        <i class="fas fa-tools"></i>
-        <label for="specialization" class="sr-only">Specialization</label>
-        <input type="text" id="specialization" name="specialization" placeholder="Specialization"
-               value="{{ tech.specialization }}">
+        <label for="specialization"><i class="fas fa-tools"></i> Specialization</label>
+        <input type="text" id="specialization" name="specialization" value="{{ technician.specialization }}">
       </div>
 
       <!-- Role -->
       <div class="input-group">
-        <label for="role"><i class="fas fa-shield-alt"></i> Role:</label>
-        <select name="role" id="role" required>
-          <option value="" disabled>Select Access Level</option>
-          <option value="technician" {% if tech.user.role == 'technician' %}selected{% endif %}>Technician</option>
-          <option value="viewer" {% if tech.user.role == 'viewer' %}selected{% endif %}>Viewer (Limited)</option>
+        <label for="role"><i class="fas fa-shield-alt"></i> Role</label>
+        <select id="role" name="role">
+          <option value="technician" {% if technician.user.role=='technician' %}selected{% endif %}>Technician</option>
+          <option value="viewer" {% if technician.user.role=='viewer' %}selected{% endif %}>Viewer (Limited Access)</option>
         </select>
       </div>
-      
-      <!-- Submit button -->
+
+      <!-- Submit -->
       <button type="submit" class="submit-button">Update Technician</button>
     </form>
-
   </div>
 </div>
 {% endblock %}

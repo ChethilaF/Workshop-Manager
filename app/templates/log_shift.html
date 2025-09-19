@@ -3,65 +3,98 @@
 {% block title %}Shift Dashboard{% endblock %}
 
 {% block extra_css %}
-<!-- Log Shift CSS -->
+<!-- Custom CSS for shift logging -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/log_shift.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="log-shift-container">
 
+  <!-- Page heading with technician name -->
   <h2>Time Logging for {{ technician.name }}</h2>
 
+  <!-- Shift form -->
   <form method="POST" id="shiftForm">
+
     {% if not shift %}
-      <!-- No shift yet: start work -->
-      <div class="form-section">
-        <label>Arrival Time:</label>
-        <input type="time" name="start_time" id="startTime" required>
-        <button type="submit">Start Work</button>
-      </div>
+    <!-- No shift yet: allow technician to log start time -->
+    <div class="form-section">
+      <label for="startTime">Arrival Time:</label>
+      <input type="time" name="start_time" id="startTime" required aria-required="true">
+      <button type="submit">Start Work</button>
+    </div>
 
     {% elif not shift.end_time %}
-      <!-- Shift in progress: enter departure -->
-      <div class="form-section">
-        <label>Arrival Time:</label>
-        <input type="time" value="{{ shift.start_time.strftime('%H:%M') }}" readonly>
+    <!-- Shift in progress: show arrival, allow logging end time -->
+    <div class="form-section">
+      <label for="arrivalTime">Arrival Time:</label>
+      <input type="time" id="arrivalTime" value="{{ shift.start_time.strftime('%H:%M') }}" readonly
+        aria-readonly="true">
 
-        <label>Departure Time:</label>
-        <input type="time" name="end_time" id="endTime" required>
-        <button type="submit">End Work</button>
-      </div>
+      <label for="endTime">Departure Time:</label>
+      <input type="time" name="end_time" id="endTime" required aria-required="true">
+      <button type="submit">End Work</button>
+    </div>
 
     {% else %}
-      <!-- Shift completed -->
-      <p>Shift complete for today.</p>
-      <p>Arrival: {{ shift.start_time.strftime('%H:%M') }}, Departure: {{ shift.end_time.strftime('%H:%M') }}</p>
+    <!-- Shift already completed -->
+    <p>Shift complete for today.</p>
+    <p>Arrival: {{ shift.start_time.strftime('%H:%M') }}, Departure: {{ shift.end_time.strftime('%H:%M') }}</p>
     {% endif %}
+
   </form>
 
+  <!-- Back link -->
   <a class="back-link" href="{{ url_for('main.shift_dashboard') }}">&larr; Back to Shift Dashboard</a>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Auto-fill current time for arrival
-  const startInput = document.getElementById('startTime');
-  if (startInput) {
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, '0');
-    const minutes = now.getMinutes().toString().padStart(2, '0');
-    startInput.value = `${hours}:${minutes}`;
-  }
+  document.addEventListener("DOMContentLoaded", () => {
+    // Utility to format current time as HH:MM
+    function getCurrentTime() {
+      const now = new Date();
+      return now.toTimeString().slice(0, 5); // HH:MM
+    }
 
-  // Auto-redirect after form submission
-  const form = document.getElementById('shiftForm');
-  form.addEventListener('submit', () => {
-    setTimeout(() => {
-      window.location.href = "{{ url_for('main.shift_dashboard') }}";
-    }, 500); // small delay to allow POST request
+    // Auto-fill current time for arrival if shift hasn't started
+    const startInput = document.getElementById("startTime");
+    if (startInput) {
+      startInput.value = getCurrentTime();
+    }
+
+    // Auto-fill current time for end if ending a shift
+    const endInput = document.getElementById("endTime");
+    if (endInput) {
+      endInput.value = getCurrentTime();
+    }
+
+    // Handle form submission more safely
+    const form = document.getElementById("shiftForm");
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        try {
+          const res = await fetch(form.action || window.location.href, {
+            method: form.method,
+            body: formData,
+          });
+
+          if (res.ok) {
+            // Redirect only after server confirms save
+            window.location.href = "{{ url_for('main.shift_dashboard') }}";
+          } else {
+            alert("Error saving shift. Please try again.");
+          }
+        } catch (err) {
+          console.error("Shift form error:", err);
+          alert("Connection error. Please try again.");
+        }
+      });
+    }
   });
-});
 </script>
 {% endblock %}

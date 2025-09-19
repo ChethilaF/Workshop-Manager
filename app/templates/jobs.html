@@ -17,54 +17,64 @@
       <i class="fas fa-plus"></i> Add New Job
     </a>
   </div>
-  {% endif %}
+{% endif %}
 
-  <div class="job-grid">
-    {% for job in jobs %}
-    <div class="job-card">
-      <div class="job-description">{{ job.job_description }}</div>
+<div class="job-grid">
+  {% for job in jobs %}
+  <div class="job-card" tabindex="0" aria-label="Job {{ job.job_description }} for {{ job.customer.full_name if job.customer else 'N/A' }}">
+    <div class="job-description">{{ job.job_description }}</div>
 
-      <div class="job-details">
-        <p><i class="fas fa-user"></i> Customer - {{ job.customer.name }}</p>
-        <p><i class="fas fa-wrench"></i> Technician - {{ job.technician.name }}</p>
-        <p><i class="fas fa-tasks"></i> Status - <span class="status {{ job.status|lower|replace(' ', '-') }}">{{
-            job.status }}</span></p>
-        <p><i class="fas fa-calendar-alt"></i> Start - {{ job.start_date or 'N/A' }}</p>
-        <p><i class="fas fa-calendar-check"></i> End - {{ job.end_date or 'N/A' }}</p>
-        <p><i class="fas fa-dollar-sign"></i> Cost - ${{ job.total_cost }}</p>
-        <p><i class="fas fa-car"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{ job.vehicle_year }}
-        </p>
-        <p><i class="fas fa-car"></i> Rego - {{ job.vehicle_registration }}</p>
-        <p><i class="fas fa-clock"></i> Target Duration -
-          {% if job.target_duration %}
-          {% set duration = job.target_duration|int %}
-          {% set h = duration // 60 %}
-          {% set m = duration % 60 %}
-          {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
-          {% else %}
+    <div class="job-details">
+      <p><i class="fas fa-user"></i> Customer: {{ job.customer.full_name if job.customer else 'N/A' }}</p>
+      <p><i class="fas fa-wrench"></i> Technician: {{ job.assigned_technician.full_name if job.assigned_technician else 'N/A' }}</p>
+      <p>
+        <i class="fas fa-tasks"></i> Status: 
+        <span class="status {{ job.status|lower|replace(' ', '-') }}">{{ job.status }}</span>
+      </p>
+      <p><i class="fas fa-calendar-alt"></i> Start: {{ job.start_time.strftime('%Y-%m-%d') if job.start_time else 'N/A' }}</p>
+      <p><i class="fas fa-calendar-check"></i> End: {{ job.end_time.strftime('%Y-%m-%d') if job.end_time else 'N/A' }}</p>
+      <p><i class="fas fa-dollar-sign"></i> Cost: ${{ '%.2f'|format(job.total_cost or 0) }}</p>
+      <p><i class="fas fa-car"></i> Vehicle: {{ job.vehicle_make or '' }} {{ job.vehicle_model or '' }} {{ job.vehicle_year or '' }}</p>
+      <p><i class="fas fa-car"></i> Rego: {{ job.vehicle_registration or 'N/A' }}</p>
+      <p><i class="fas fa-clock"></i> Target Duration: 
+        {% if job.target_duration %}
+          {% set mins = job.target_duration %}
+          {% set days = mins // (24*60) %}
+          {% set hours = (mins % (24*60)) // 60 %}
+          {% set minutes = mins % 60 %}
+          {% if days > 0 %}{{ days }} day{% if days != 1 %}s{% endif %} {% endif %}
+          {% if hours > 0 %}{{ hours }} hr{% if hours != 1 %}s{% endif %} {% endif %}
+          {% if minutes > 0 %}{{ minutes }} min{% endif %}
+        {% else %}
           N/A
-          {% endif %}
-        </p>
-      </div>
-
-      {% if current_user.role == 'admin' %}
-      <div class="job-actions">
-        <div class="top-buttons">
-          <a href="{{ url_for('main.edit_job', id=job.id) }}" class="edit-btn"><i class="fas fa-edit"></i> Edit</a>
-          <form action="{{ url_for('main.delete_job', id=job.id) }}" method="POST" class="delete-form">
-            <button type="submit" onclick="return confirm('Are you sure?')" class="delete-btn"><i
-                class="fas fa-trash"></i> Delete</button>
-          </form>
-        </div>
-        <div class="bottom-button">
-          <a href="{{ url_for('main.jobs_waiting_approval') }}" class="approval-btn"><i class="fas fa-check"></i>
-            Waiting
-            Approval</a>
-        </div>
-      </div>
-      {% endif %}
+        {% endif %}
+      </p>
     </div>
-    {% endfor %}
+
+    {% if current_user.role == 'admin' %}
+    <div class="job-actions">
+      <div class="top-buttons">
+        <a href="{{ url_for('main.edit_job', id=job.id) }}" class="edit-btn">
+          <i class="fas fa-edit"></i> Edit
+        </a>
+        <form action="{{ url_for('main.delete_job', id=job.id) }}" method="POST" class="delete-form">
+          <button type="submit" onclick="return confirm('Are you sure you want to delete this job?')" class="delete-btn">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        </form>
+      </div>
+      <div class="bottom-button">
+        <a href="{{ url_for('main.jobs_waiting_approval') }}" class="approval-btn">
+          <i class="fas fa-check"></i> Waiting Approval
+        </a>
+      </div>
+    </div>
+    {% endif %}
   </div>
+  {% endfor %}
 </div>
+
+{% if current_user.role == 'admin' %}
+</div>
+{% endif %}
 {% endblock %}

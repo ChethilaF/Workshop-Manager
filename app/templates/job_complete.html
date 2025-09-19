@@ -2,30 +2,37 @@
 {% block title %}Job Completed{% endblock %}
 
 {% block content %}
-<!-- Main heading for job completion -->
-<h2>✅ Job Completed</h2>
-<!-- Consider adding a class for styling, e.g., <h2 class="job-complete-heading"> -->
+<!-- Job completion heading with icon -->
+<h2 class="job-complete-heading">✅ Job Completed</h2>
 
 <!-- Job details -->
-<p>Job ID: {{ job.id }}</p>
-<p>Description: {{ job.description }}</p>
-<p>Status: {{ job.status }}</p>
+<div class="job-details">
+  <p><strong>Job ID:</strong> {{ job.id }}</p>
+  <p><strong>Description:</strong> {{ job.description }}</p>
+  <p><strong>Status:</strong> {{ job.status }}</p>
+  {% if job.technician %}
+  <p><strong>Technician:</strong> {{ job.technician.name }}</p>
+  {% endif %}
+  {% if job.customer %}
+  <p><strong>Customer:</strong> {{ job.customer.name }}</p>
+  {% endif %}
+</div>
 
-<!-- Download PDF button -->
-<a href="{{ url_for('main.download_job_pdf', job_id=job.id) }}" class="btn btn-primary">
-  Download Job Summary
-</a><br><br>
-<!-- TODO: Consider replacing <br><br> with CSS margin for spacing -->
+<!-- Action buttons -->
+<div class="job-actions">
+  <!-- Download PDF summary -->
+  <a href="{{ url_for('main.download_job_pdf', job_id=job.id) }}"
+     class="btn btn-primary"
+     aria-label="Download job summary for Job {{ job.id }}">
+    Download Job Summary
+  </a>
 
-<!-- Navigation back to dashboard -->
-<a href="{{ url_for('main.dashboard') }}">Back to Dashboard</a>
-<!-- TODO: Add consistent button style here for UX consistency, e.g., class="btn btn-secondary" -->
+  <!-- Back to dashboard -->
+  <a href="{{ url_for('main.dashboard') }}"
+     class="btn btn-secondary"
+     aria-label="Return to Dashboard">
+    Back to Dashboard
+  </a>
+</div>
+
 {% endblock %}
-
-<!-- Suggested improvements / notes:
-1. Add CSS classes to paragraphs for better control over spacing and typography.
-2. Replace <br><br> with CSS margin/padding for semantic HTML.
-3. Optionally include technician name, customer name, or vehicle details for clarity.
-4. Consider adding a success icon or styled notification banner for visual feedback.
-5. Ensure responsive layout if viewed on mobile devices.
--->

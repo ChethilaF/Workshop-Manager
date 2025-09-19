@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block extra_css %}
+<!-- Page-specific CSS -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/weekly_summary_dashboard.css') }}">
+<!-- Font Awesome icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 {% endblock %}
 
@@ -15,15 +17,15 @@
     <div class="tech-circle" id="tech-{{ tech.id }}">
         <span>{{ tech.name }}</span>
 
-        <!-- PDF list inside the circle, initially hidden -->
+        <!-- Hidden PDF list & actions -->
         <div class="pdf-content" style="display: none;">
             {% set pdfs = get_pdfs_for_tech(tech.id) %}
             {% if pdfs %}
-            <ul>
+            <ul class="pdf-list">
                 {% for pdf in pdfs %}
-                <li>
-                    {{ pdf }}
-                    <a href="{{ url_for('main.download_pdf', filename=pdf) }}" class="btn-download">
+                <li class="pdf-item">
+                    <span>{{ pdf }}</span>
+                    <a href="{{ url_for('main.download_pdf', filename=pdf) }}" class="btn-download" aria-label="Download {{ pdf }}">
                         <i class="fas fa-download"></i> Download
                     </a>
                 </li>
@@ -33,8 +35,11 @@
             <p>No PDFs generated yet.</p>
             {% endif %}
 
+            <!-- Generate new weekly summary PDF -->
             <form action="{{ url_for('main.generate_weekly_summary', tech_id=tech.id) }}" method="POST">
-                <button type="submit" class="btn-generate">Generate PDF</button>
+                <button type="submit" class="btn-generate" aria-label="Generate weekly summary PDF for {{ tech.name }}">
+                    <i class="fas fa-file-pdf"></i> Generate PDF
+                </button>
             </form>
         </div>
     </div>
@@ -44,30 +49,40 @@
 
 {% block extra_js %}
 <script>
-document.querySelectorAll('.tech-circle').forEach(circle => {
-  circle.addEventListener('click', e => {
-    // If the user clicked a button or a link, let it work normally
-    if (e.target.closest('a') || e.target.closest('button')) {
-      return;
+document.addEventListener("DOMContentLoaded", () => {
+  const circles = document.querySelectorAll(".tech-circle");
+
+  circles.forEach(circle => {
+    circle.setAttribute("tabindex", "0");
+
+    function toggleCircle() {
+      circles.forEach(c => {
+        if (c !== circle) {
+          c.classList.remove("expanded");
+          const pdf = c.querySelector(".pdf-content");
+          if (pdf) pdf.style.display = "none";
+        }
+      });
+
+      circle.classList.toggle("expanded");
+      const pdfContent = circle.querySelector(".pdf-content");
+      if (pdfContent) {
+        pdfContent.style.display =
+          pdfContent.style.display === "block" ? "none" : "block";
+      }
     }
 
-    e.preventDefault();
-
-    // Collapse all other circles
-    document.querySelectorAll('.tech-circle').forEach(c => {
-      if (c !== circle) {
-        c.classList.remove('expanded');
-        const pdf = c.querySelector('.pdf-content');
-        if (pdf) pdf.style.display = 'none';
-      }
+    circle.addEventListener("click", e => {
+      if (e.target.closest("a, button")) return;
+      toggleCircle();
     });
 
-    // Toggle clicked circle
-    circle.classList.toggle('expanded');
-    const pdfContent = circle.querySelector('.pdf-content');
-    if (pdfContent) {
-      pdfContent.style.display = pdfContent.style.display === 'block' ? 'none' : 'block';
-    }
+    circle.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleCircle();
+      }
+    });
   });
 });
 </script>

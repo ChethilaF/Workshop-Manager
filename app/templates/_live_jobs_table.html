@@ -1,0 +1,45 @@
+{% if jobs %}
+<table class="jobs-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Technician</th>
+            <th>Status</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        <tr class="job-row {{ job.status|lower|replace(' ', '-') }}">
+            <td>{{ job.id }}</td>
+            <td>{{ job.customer.name }}</td>
+            <td>{{ job.vehicle_registration }}</td>
+            <td>{{ job.technician.name }}</td>
+            <td>{{ job.status }}</td>
+            <td>{{ job.start_time.strftime('%H:%M') if job.start_time else '-' }}</td>
+            <td>{{ job.end_time.strftime('%H:%M') if job.end_time else '-' }}</td>
+            <td class="actions">
+                <form action="{{ url_for('main.admin_action', job_id=job.id, action='stop') }}" method="POST">
+                    <button type="submit" class="btn-stop" title="Stop Job"><i class="fas fa-stop"></i></button>
+                </form>
+                {% if job.status != 'Paused' %}
+                <form action="{{ url_for('main.admin_action', job_id=job.id, action='pause') }}" method="POST">
+                    <button type="submit" class="btn-pause" title="Pause Job"><i class="fas fa-pause"></i></button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('main.admin_action', job_id=job.id, action='resume') }}" method="POST">
+                    <button type="submit" class="btn-resume" title="Resume Job"><i class="fas fa-play"></i></button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No live jobs at the moment.</p>
+{% endif %}

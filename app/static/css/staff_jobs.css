@@ -126,6 +126,13 @@ p {
   transform: scale(1.05);
 }
 
+.control-button.disabled {
+  background-color: #555;
+  color: #ccc;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .decline-button {
   background-color: #ee0800;
   color: #000;
