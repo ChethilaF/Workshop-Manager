@@ -10,7 +10,8 @@ public_key_pem = os.getenv("VAPID_PUBLIC_KEY")
 
 public_key_pem_clean = public_key_pem.replace("\\n", "\n").encode()
 
-public_key = serialization.load_pem_public_key(public_key_pem_clean, backend=default_backend())
+public_key = serialization.load_pem_public_key(public_key_pem_clean,
+                                               backend=default_backend())
 
 raw_bytes = public_key.public_bytes(
     encoding=serialization.Encoding.X962,

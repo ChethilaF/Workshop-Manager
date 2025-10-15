@@ -47,6 +47,7 @@ p {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
 }
 
 .job-card:hover {
@@ -58,7 +59,7 @@ p {
 /* Job description styling */
 .job-description {
   text-align: center;
-  font-size: 1.3rem;   /* bigger text */
+  font-size: 1.3rem;
   font-weight: bold;
   margin-bottom: 12px;
   color: #fff;
@@ -69,7 +70,7 @@ p {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.05rem;   /* bigger than before */
+  font-size: 1.05rem;
   margin-bottom: 4px;
 }
 
@@ -77,8 +78,6 @@ p {
   color: #00C8DF; /* aqua icon */
   min-width: 20px;
 }
-
-
 
 /* ===============================
    Action Buttons at bottom
@@ -141,6 +140,84 @@ p {
   background-color: #ff4444;
   color: #000;
   transform: scale(1.05);
+}
+
+/* ===============================
+   Status Boxes
+   =============================== */
+.status-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.status-box.waiting {
+  background-color: #ffbf00; /* amber */
+  color: #000;
+}
+
+.status-box.approved {
+  background-color: #28a745; /* green */
+  color: #fff;
+}
+
+.status-box.retry {
+  background-color: #dc3545; /* red */
+  color: #fff;
+}
+
+/* ===============================
+   Declined Job Styling
+   =============================== */
+.job-card.declined {
+  background-color: #2b0b0b; /* subtle dark red background */
+  border: 1px solid #dc3545;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+.job-card.declined:hover {
+  transform: none;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+.job-card.declined .job-description {
+  color: #ffb3b3; /* lighter red text */
+}
+
+.job-card.declined .job-info small {
+  color: #ffb3b3;
+}
+
+.job-card.declined .status-box {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Only hide buttons for the declined job */
+.job-card.declined .job-actions > form,
+.job-card.declined .job-actions > a {
+  display: none;
+}
+
+/* ===============================
+   Accepted Job Styling
+   =============================== */
+.job-card.accepted {
+  background-color: #0f3d0f; /* subtle green */
+  border: 1px solid #28a745;
+}
+
+/* ===============================
+   Waiting Job Styling
+   =============================== */
+.job-card.waiting {
+  background-color: #2f2f2f;
+  border: 1px solid #ffaa00;
 }
 
 /* ===============================

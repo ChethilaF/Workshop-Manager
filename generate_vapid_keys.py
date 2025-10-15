@@ -22,7 +22,7 @@ def generate_keys():
     )
     base64_public = base64.urlsafe_b64encode(raw_bytes).decode("utf-8")
 
-    print("✅ Keys generated")
+    print("Keys generated")
     print("VAPID_PRIVATE_KEY (PEM saved to vapid_private.pem)")
     print(private_pem.decode())
     print("VAPID_PUBLIC_KEY (PEM saved to vapid_public.pem)")

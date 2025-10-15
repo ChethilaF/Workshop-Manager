@@ -15,7 +15,8 @@
 {% if jobs %}
 <ul class="jobs-list">
   {% for job in jobs %}
-  <li class="job-card">
+  <li class="job-card 
+      {% if job.status == 'Declined' %}declined{% elif job.status == 'Accepted' %}accepted{% else %}waiting{% endif %}">
 
     <!-- Job Description -->
     <div class="job-info">
@@ -24,56 +25,67 @@
       <!-- Job Details -->
       <small><i class="fas fa-tasks"></i> Status - {{ job.status }}</small>
       <small><i class="fas fa-car"></i> Vehicle Rego - {{ job.vehicle_registration }}</small>
-      <small><i class="fas fa-car-side"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{
-        job.vehicle_year }}</small>
+      <small><i class="fas fa-car-side"></i> Vehicle - {{ job.vehicle_make }} {{ job.vehicle_model }} {{ job.vehicle_year }}</small>
       <small>
         <i class="fas fa-clock"></i> Target Duration -
         {% if job.target_duration %}
-        {% set duration = job.target_duration|int %}
-        {% set h = duration // 60 %}
-        {% set m = duration % 60 %}
-        {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
+          {% set duration = job.target_duration|int %}
+          {% set h = duration // 60 %}
+          {% set m = duration % 60 %}
+          {% if h > 0 %}{{ h }} hr{% endif %}{% if m > 0 %} {{ m }} min{% endif %}
         {% else %}
-        N/A
+          N/A
         {% endif %}
       </small>
-      <small><i class="fas fa-user"></i> Customer - {{ job.customer.name }}</small>
-      <small><i class="fas fa-calendar-alt"></i> Start - {{ job.start_date or 'N/A' }}</small>
-      <small><i class="fas fa-calendar-check"></i> End - {{ job.end_date or 'N/A' }}</small>
+      <small><i class="fas fa-user"></i> Customer - {{ job.customer.full_name }}</small>
+      <small><i class="fas fa-calendar-alt"></i> Start - {{ job.start_time or 'N/A' }}</small>
+      <small><i class="fas fa-calendar-check"></i> End - {{ job.end_time or 'N/A' }}</small>
     </div>
 
     <!-- Job Actions -->
     <div class="job-actions">
-      {% if not job.accepted %}
-      <!-- Accept Job -->
-      <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
-        <button type="submit" class="accept-button" aria-label="Accept job {{ job.job_description }}">
-          <i class="fas fa-check"></i> Accept
-        </button>
-      </form>
+      {% if current_user.role != 'admin' %}
+          {% if job.status == 'Waiting' or job.status is none %}
+            <!-- Accept Job -->
+            <form method="POST" action="{{ url_for('main.accept_job', job_id=job.id) }}">
+              <button type="submit" class="accept-button" aria-label="Accept job {{ job.job_description }}">
+                <i class="fas fa-check"></i> Accept
+              </button>
+            </form>
 
-      <!-- Decline Job -->
-      <a href="{{ url_for('main.staff_dashboard') }}" class="decline-button"
-        aria-label="Decline job {{ job.job_description }}">
-        <i class="fas fa-times"></i> Decline
-      </a>
+            <!-- Decline Job -->
+            <form method="POST" action="{{ url_for('main.decline_job', job_id=job.id) }}">
+              <button type="submit" class="decline-button" aria-label="Decline job {{ job.job_description }}">
+                <i class="fas fa-times"></i> Decline
+              </button>
+            </form>
 
+          {% elif job.status == 'Declined' %}
+            <!-- Declined Status -->
+            <div class="status-box declined">
+              <i class="fas fa-times-circle"></i> Declined — waiting for admin action
+            </div>
+
+          {% elif job.status in ['Accepted', 'Running', 'In Progress', 'Paused'] %}
+            <!-- Enter Job Control -->
+            <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="control-button"
+              aria-label="Control job {{ job.job_description }}">
+              <i class="fas fa-cogs"></i> Enter Job Control
+            </a>
+          {% endif %}
       {% else %}
-      {% if job.status in ['Running', 'In Progress', 'Paused'] %}
-      <!-- Enter Job Control -->
-      <a href="{{ url_for('main.job_control', job_id=job.id) }}" class="control-button"
-        aria-label="Control job {{ job.job_description }}">
-        <i class="fas fa-cogs"></i> Enter Control
-      </a>
-      {% else %}
-      <!-- Job Locked / Sent for Approval -->
-      <button class="control-button disabled" disabled aria-label="Job {{ job.job_description }} locked">
-        <i class="fas fa-lock"></i> Job Locked
-      </button>
-      {% endif %}
+          <!-- Admin view: show status but no action buttons -->
+          {% if job.status == 'Declined' %}
+          <div class="status-box declined">
+            <i class="fas fa-times-circle"></i> Declined — waiting for admin action
+          </div>
+          {% elif job.status in ['Accepted', 'Running', 'In Progress', 'Paused', 'Waiting', None] %}
+          <div class="status-box waiting">
+            <i class="fas fa-info-circle"></i> {{ job.status or 'Waiting' }}
+          </div>
+          {% endif %}
       {% endif %}
     </div>
-
 
   </li>
   {% endfor %}

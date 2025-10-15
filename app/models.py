@@ -72,14 +72,12 @@ class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     job_description = db.Column(db.String(255), nullable=False)
     status = db.Column(db.String(50), default='Pending')
-
+    accepted = db.Column(db.Boolean, default=False)
     technician_id = db.Column(db.Integer, db.ForeignKey('technicians.id'),
                               nullable=True)
     technician = db.relationship('Technician', back_populates='jobs')
-
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'))
     customer = db.relationship('Customer', back_populates='jobs')
-
     start_time = db.Column(db.DateTime)
     end_time = db.Column(db.DateTime)
     target_duration = db.Column(db.Integer, default=0)  # minutes
@@ -92,8 +90,8 @@ class Job(db.Model):
     total_cost = db.Column(db.Float, default=0.0)
     notes = db.Column(db.Text)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
-
     pause_logs = db.relationship('PauseLog', backref='job', lazy=True)
+    status_message = db.Column(db.String(255))      # For admin notifications
 
     def __repr__(self):
         return f"<Job {self.job_description} - Status: {self.status}>"
@@ -103,17 +101,17 @@ class Job(db.Model):
 # Pause Log Model
 # ==========================
 class PauseLog(db.Model):
-    __tablename__ = 'pause_log'
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
     pause_start = db.Column(db.DateTime, default=datetime.utcnow)
     pause_end = db.Column(db.DateTime)
     reason = db.Column(db.String(255))
+    duration = db.Column(db.Integer)  # duration in seconds
 
-    def duration(self):
+    def duration_seconds(self):
         if self.pause_end:
-            return (self.pause_end - self.pause_start).total_seconds()
-        return 0
+            return int((self.pause_end - self.pause_start).total_seconds())
+        return int((datetime.utcnow() - self.pause_start).total_seconds())
 
 
 # ==========================

@@ -5,11 +5,9 @@
 <!-- Page-specific CSS for admin dashboard -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
 <!-- Font Awesome icons -->
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      integrity="sha512-papqZ1+MZtzYh0YFkibMH0yovm29sH6T7pNNvT4JpyD1EIQhKiLPqcO3V+u8wzV6x6bfv5d3ZlzZz4UuTq8O2g=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-papqZ1+MZtzYh0YFkibMH0yovm29sH6T7pNNvT4JpyD1EIQhKiLPqcO3V+u8wzV6x6bfv5d3ZlzZz4UuTq8O2g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 {% endblock %}
 
 {% block content %}
@@ -24,49 +22,93 @@
 
     <div class="dashboard-grid">
         <!-- Staff Management card -->
-        <a href="{{ url_for('main.staff_dashboard') }}"
-           class="dashboard-card"
-           aria-label="Go to Staff Management section">
+        <a href="{{ url_for('main.staff_dashboard') }}" class="dashboard-card"
+            aria-label="Go to Staff Management section">
             <i class="fas fa-users-cog"></i>
             <h3>Staff Management</h3>
             <p>View and manage staff users</p>
         </a>
 
         <!-- Jobs card -->
-        <a href="{{ url_for('main.jobs') }}"
-           class="dashboard-card"
-           aria-label="Go to Jobs section">
+        <a href="{{ url_for('main.jobs') }}" class="dashboard-card" aria-label="Go to Jobs section">
             <i class="fas fa-clipboard-list"></i>
             <h3>Jobs</h3>
             <p>Assign, edit, and track jobs</p>
         </a>
 
         <!-- Customers card -->
-        <a href="{{ url_for('main.customers') }}"
-           class="dashboard-card"
-           aria-label="Go to Customers section">
+        <a href="{{ url_for('main.customers') }}" class="dashboard-card" aria-label="Go to Customers section">
             <i class="fas fa-user-friends"></i>
             <h3>Customers</h3>
             <p>Manage customer profiles</p>
         </a>
 
         <!-- Weekly Summary PDFs card -->
-        <a href="{{ url_for('main.weekly_summary_dashboard') }}"
-           class="dashboard-card"
-           aria-label="Go to Weekly Summary PDFs section">
+        <a href="{{ url_for('main.weekly_summary_dashboard') }}" class="dashboard-card"
+            aria-label="Go to Weekly Summary PDFs section">
             <i class="fas fa-file-pdf"></i>
             <h3>Weekly Summary PDFs</h3>
             <p>Generate and download weekly summaries</p>
         </a>
 
         <!-- Live Jobs card -->
-        <a href="{{ url_for('main.live_jobs') }}"
-           class="dashboard-card"
-           aria-label="Go to Live Jobs section">
+        <a href="{{ url_for('main.live_jobs') }}" class="dashboard-card" aria-label="Go to Live Jobs section">
             <i class="fas fa-bolt"></i>
             <h3>Live Jobs</h3>
             <p>Monitor and manage live jobs</p>
         </a>
     </div>
+
+    <!-- Live Job Monitor Section -->
+    <h2>Live Job Monitor</h2>
+
+    <div class="live-jobs-section">
+        <!-- Pending Jobs -->
+        <h3>Pending Jobs</h3>
+        <div class="live-jobs-grid">
+            {% for job in pending_jobs %}
+            <div class="job-card waiting">
+                <h4>Job #{{ job.id }} - {{ job.vehicle_color }} {{ job.vehicle_model }} ({{ job.vehicle_registration }})
+                </h4>
+                <p>Technician: {{ job.technician.name if job.technician else 'Unassigned' }}</p>
+                <p>Status: <span class="status">Waiting</span></p>
+            </div>
+            {% else %}
+            <p>No pending jobs.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Accepted Jobs -->
+        <h3>Accepted Jobs</h3>
+        <div class="live-jobs-grid">
+            {% for job in accepted_jobs %}
+            <div class="job-card accepted">
+                <h4>Job #{{ job.id }} - {{ job.vehicle_color }} {{ job.vehicle_model }} ({{ job.vehicle_registration }})
+                </h4>
+                <p>Technician: {{ job.technician.name }}</p>
+                <p>Status: <span class="status">Accepted</span></p>
+            </div>
+            {% else %}
+            <p>No accepted jobs.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Declined Jobs -->
+        <h3>Declined Jobs</h3>
+        <div class="live-jobs-grid">
+            {% for job in declined_jobs %}
+            <div class="job-card declined">
+                <h4>Job #{{ job.id }} - {{ job.vehicle_color }} {{ job.vehicle_model }} ({{ job.vehicle_registration }})
+                </h4>
+                <p>Technician: {{ job.technician.name }}</p>
+                <p>Status: <span class="status">Declined</span></p>
+                <p class="decline-message">{{ job.technician.name }} has declined this job. Please follow up.</p>
+            </div>
+            {% else %}
+            <p>No declined jobs.</p>
+            {% endfor %}
+        </div>
+    </div>
+
 </div>
 {% endblock %}

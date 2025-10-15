@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from app.utils.pdf_generator import get_pdfs_for_tech
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
@@ -10,19 +11,18 @@ load_dotenv()
 
 # Initialize extensions
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'main.login'
 
 
 def create_app():
-
     app = Flask(__name__)
 
     # App configuration
     app.config['SECRET_KEY'] = 'secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Workshop.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # Disable unnecessary tracking
 
     # VAPID keys for push notifications
     app.config["VAPID_PUBLIC_KEY"] = os.getenv("VAPID_PUBLIC_KEY") or ""
@@ -30,18 +30,17 @@ def create_app():
 
     # Initialize extensions with this app
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     with app.app_context():
-        # Import and register routes blueprint
         from .routes import main
         app.register_blueprint(main)
 
-        # Import notification function and Job model
+        # Background job notifications
         from app.utils.notifications import send_push_to_technician
         from app.models import Job
 
-        # Function to notify technicians about active jobs every hour
         def notify_active_jobs():
             active_jobs = Job.query.filter(Job.status == "In Progress").all()
             for job in active_jobs:
@@ -57,5 +56,17 @@ def create_app():
         scheduler.start()
 
     app.jinja_env.globals.update(get_pdfs_for_tech=get_pdfs_for_tech)
+
+    # ------------------- GLOBAL ERROR HANDLERS -------------------
+    @app.errorhandler(404)
+    def page_not_found(e):
+        flash("Page not found. Please check the URL.", "error")
+        return render_template("404.html"), 404
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        db.session.rollback()
+        flash("An unexpected error occurred. Please try again.", "error")
+        return render_template("500.html"), 500
 
     return app

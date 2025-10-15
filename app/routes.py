@@ -1,22 +1,17 @@
-# flask imports
 from flask import (Blueprint, render_template, redirect, url_for, request,
                    flash, send_from_directory, jsonify, abort)
-# importing models.py
-from app.models import (User, Customer, Technician, Shift, Job, PauseLog, PushSubscription)
-# flask login imports
+from app.models import (User, Customer, Technician, Shift, Job, PauseLog,
+                        PushSubscription, Notification)
 from flask_login import login_user, logout_user, login_required, current_user
-# werkzeug security for password hashing
+# werkzeug security for password hashing and verification,
+#  used to hash the passwords entered by the admin when registering a new user
+#  and when the user is  login in it is used to verify them during login.
 from werkzeug.security import check_password_hash
-# sqlalchemy imports
 from sqlalchemy.exc import IntegrityError
-# datetime imports
 from datetime import datetime, date, timedelta
-# PDF generation utility
 from app.utils.pdf_generator import (generate_weekly_summary_pdf,
                                      get_pdfs_for_tech, PDF_DIR)
-# database import
 from app import db
-# flask app import
 from flask import current_app
 # os import for file path handling
 import os
@@ -82,7 +77,15 @@ def admin_dashboard():
         return redirect(url_for('main.staff_dashboard'))
 
     technicians = Technician.query.all()
-    return render_template('admin_dashboard.html', technicians=technicians)
+    pending_jobs = Job.query.filter_by(accepted=None).all()
+    accepted_jobs = Job.query.filter_by(accepted=True).all()
+    declined_jobs = Job.query.filter_by(accepted=False).all()
+
+    return render_template('admin_dashboard.html',
+                           technicians=technicians,
+                           pending_jobs=pending_jobs,
+                           accepted_jobs=accepted_jobs,
+                           declined_jobs=declined_jobs)
 
 
 # Staff dashboard showing technicians.
@@ -279,7 +282,8 @@ def add_technician():
 @login_required
 def edit_technician(id):
     if current_user.role == 'reception':
-        flash("Access denied. Reception users can only access dashboard.", "error")
+        flash("Access denied. Reception users can only access dashboard.",
+              "error")
         return redirect(url_for('main.shift_dashboard'))
 
     tech = Technician.query.get_or_404(id)
@@ -297,7 +301,7 @@ def edit_technician(id):
         # Update user info
         tech.user.username = username
         tech.user.role = role
-        tech.user.email = email.strip() if email and email.strip() else None  # optional
+        tech.user.email = email.strip() if email and email.strip() else None
 
         if new_password:
             tech.user.set_password(new_password)
@@ -313,7 +317,8 @@ def edit_technician(id):
         except IntegrityError as e:
             db.session.rollback()
             if "user.username" in str(e.orig):
-                flash("Username already exists. Please choose another.", "error")
+                flash("Username already exists. Please choose another.",
+                      "error")
             elif "user.email" in str(e.orig):
                 flash("Email already exists. Please choose another.", "error")
             else:
@@ -419,7 +424,6 @@ def add_job():
             notes=request.form.get('notes')
         )
 
-
         db.session.add(new_job)
         db.session.commit()
         flash("Job added successfully.", "success")
@@ -450,14 +454,17 @@ def edit_job(id):
         # Dates
         start_date_str = request.form.get('start_date')
         end_date_str = request.form.get('end_date')
-        job.start_time = datetime.strptime(start_date_str, '%Y-%m-%d') if start_date_str else None
-        job.end_time = datetime.strptime(end_date_str, '%Y-%m-%d') if end_date_str else None
+        job.start_time = (datetime.strptime(start_date_str, '%Y-%m-%d')
+                          if start_date_str else None)
+        job.end_time = (datetime.strptime(end_date_str, '%Y-%m-%d')
+                        if end_date_str else None)
 
         # Target duration
         target_days = int(request.form.get('target_days', 0))
         target_hours = int(request.form.get('target_hours', 0))
         target_minutes = int(request.form.get('target_minutes', 0))
-        job.target_duration = target_days*24*60 + target_hours*60 + target_minutes
+        job.target_duration = (target_days*24*60 +
+                               target_hours*60 + target_minutes)
 
         db.session.commit()
         flash("Job updated successfully.", "success")
@@ -504,10 +511,14 @@ def delete_job(id):
 @login_required
 def job_control(job_id):
     job = Job.query.get_or_404(job_id)
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
+    if (
+        current_user.role == 'technician'
+        and job.technician.user_id != current_user.id
+    ):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
     return render_template('job_control.html', job=job)
+
 
 # Accept a job
 @main.route('/accept_job/<int:job_id>', methods=['POST'])
@@ -516,15 +527,38 @@ def accept_job(job_id):
     job = Job.query.get_or_404(job_id)
 
     # Only the assigned technician or admin can accept
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
+    if (
+        current_user.role == 'technician'
+        and job.technician.user_id != current_user.id
+    ):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
 
+    # Update job status
     job.accepted = True
     job.status = "Accepted"
+
+    # Create admin notifications
+    technician_name = (job.technician.name if
+                       job.technician else "Unknown Technician")
+    message = (
+        f"{technician_name} has accepted the job of "
+        f"{job.vehicle_color or 'N/A'} - {job.vehicle_model or 'N/A'} - "
+        f"{job.vehicle_make or 'N/A'} - {job.vehicle_registration or 'N/A'}"
+    )
+
+    admins = User.query.filter_by(role='admin').all()
+    for admin in admins:
+        notif = Notification(
+            user_id=admin.id,
+            title="Job Accepted",
+            message=message
+        )
+        db.session.add(notif)
+
     db.session.commit()
 
-    flash("Job accepted.", "success")
+    flash("You have accepted this job.", "success")
     return redirect(url_for('main.job_control', job_id=job.id))
 
 
@@ -535,24 +569,46 @@ def decline_job(job_id):
     job = Job.query.get_or_404(job_id)
 
     # Only the assigned technician or admin can decline
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
+    if current_user.role == ('technician' and
+                             job.technician.user_id != current_user.id):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
 
+    # Update job status
     job.accepted = False
     job.status = "Declined"
+
+    # Create admin notifications
+    technician_name = (job.technician.name if
+                       job.technician else "Unknown Technician")
+    message = (
+        f"{technician_name} has declined the job of "
+        f"{job.vehicle_color or 'N/A'} - {job.vehicle_model or 'N/A'} - "
+        f"{job.vehicle_make or 'N/A'} - {job.vehicle_registration or 'N/A'}"
+    )
+
+    admins = User.query.filter_by(role='admin').all()
+    for admin in admins:
+        notif = Notification(
+            user_id=admin.id,
+            title="Job Declined",
+            message=message
+        )
+        db.session.add(notif)
+
     db.session.commit()
 
-    flash("Job declined.", "warning")
+    flash("You have declined this job.", "warning")
     return redirect(url_for('main.job_control', job_id=job.id))
 
 
-# Start a job
+# ------------------- Start Job -------------------
 @main.route('/start_job/<int:job_id>', methods=['POST'])
 @login_required
 def start_job(job_id):
     job = Job.query.get_or_404(job_id)
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
+    if current_user.role == ('technician' and
+                             job.technician.user_id != current_user.id):
         flash("Unauthorized action.", "error")
         return redirect(url_for('main.staff_dashboard'))
 
@@ -564,67 +620,104 @@ def start_job(job_id):
     return redirect(url_for('main.job_control', job_id=job.id))
 
 
+# ------------------- Pause Job -------------------
 @main.route('/pause_job/<int:job_id>', methods=['POST'])
 @login_required
 def pause_job(job_id):
     job = Job.query.get_or_404(job_id)
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
-        flash("Unauthorized action.", "error")
-        return redirect(url_for('main.staff_dashboard'))
+    if current_user.role == ('technician' and
+                             job.technician.user_id != current_user.id):
+        return {"error": "Unauthorized action."}, 403
 
     now = datetime.now()
-    # Add elapsed time since start to total_work_duration
+
+    # Add elapsed time since last start to total_work_duration
     if job.start_time:
         delta = (now - job.start_time).total_seconds()
         job.total_work_duration += int(delta)
 
-    pause_reason = request.form.get("reason", "No reason provided")
+    pause_reason = request.json.get("reason", "No reason provided")
+
+    # Create a new pause log
     pause = PauseLog(job_id=job.id, pause_start=now, reason=pause_reason)
     db.session.add(pause)
 
+    job.start_time = None
     job.status = "Paused"
-    job.start_time = None  # stop current active timer
     db.session.commit()
 
-    flash("Job paused.", "warning")
-    return redirect(url_for('main.job_control', job_id=job.id))
+    return {
+        "status": job.status,
+        "total_elapsed": job.total_work_duration,
+        "pause_id": pause.id
+    }
 
 
+# ------------------- Resume Job -------------------
 @main.route('/resume_job/<int:job_id>', methods=['POST'])
 @login_required
 def resume_job(job_id):
     job = Job.query.get_or_404(job_id)
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
-        flash("Unauthorized action.", "error")
-        return redirect(url_for('main.staff_dashboard'))
+    if current_user.role == ('technician' and
+                             job.technician.user_id != current_user.id):
+        return {"error": "Unauthorized action."}, 403
 
-    job.start_time = datetime.now()
+    now = datetime.now()
+
+    # Close the last open pause log and calculate duration
+    last_pause = (PauseLog.query.filter_by(job_id=job.id, pause_end=None)
+                  .order_by(PauseLog.pause_start.desc()).first())
+    if last_pause:
+        last_pause.pause_end = now
+        last_pause.duration = int((last_pause.pause_end -
+                                  last_pause.pause_start).total_seconds())
+        db.session.commit()
+
+    job.start_time = now
     job.status = "In Progress"
     db.session.commit()
-    flash("Job resumed.", "success")
-    return redirect(url_for('main.job_control', job_id=job.id))
+
+    return {
+        "status": job.status,
+        "total_elapsed": job.total_work_duration
+    }
 
 
-# Stop a job
+# ------------------- Stop Job -------------------
 @main.route('/stop_job/<int:job_id>', methods=['POST'])
 @login_required
 def stop_job(job_id):
     job = Job.query.get_or_404(job_id)
-    if current_user.role == 'technician' and job.technician.user_id != current_user.id:
-        flash("Unauthorized action.", "error")
-        return redirect(url_for('main.staff_dashboard'))
+    if current_user.role == ('technician' and
+                             job.technician.user_id != current_user.id):
+        return {"error": "Unauthorized action."}, 403
 
-    # Update pause logs if job was running
+    now = datetime.now()
+
+    # Add remaining elapsed time if job was running
     if job.start_time:
-        last_pause = PauseLog.query.filter_by(job_id=job.id, pause_end=None).order_by(PauseLog.pause_start.desc()).first()
-        if last_pause:
-            last_pause.pause_end = datetime.now()
+        delta = (now - job.start_time).total_seconds()
+        job.total_work_duration += int(delta)
+        job.start_time = None
 
-    job.start_time = None
+    # Close any open pause log and calculate duration
+    last_pause = (PauseLog.query.filter_by(job_id=job.id, pause_end=None)
+                  .order_by(PauseLog.pause_start.desc()).first())
+    if last_pause:
+        last_pause.pause_end = now
+        last_pause.duration = int((last_pause.pause_end -
+                                  last_pause.pause_start).total_seconds())
+        db.session.commit()
+
     job.status = "Waiting for Approval"
     db.session.commit()
-    flash("Good job! You have completed the job.", "success")
-    return redirect(url_for('main.staff_jobs', tech_id=job.technician.id))
+
+    return {
+        "status": job.status,
+        "total_elapsed": job.total_work_duration,
+        "redirect_url": url_for('main.staff_jobs', tech_id=job.technician.id)
+    }
+
 # ------------------- JOB APPROVAL WORKFLOW -------------------
 
 
@@ -910,7 +1003,7 @@ def unsubscribe():
 
 
 # Send a test notification to the logged-in technician i will remove this
-# ,route in published version
+# route in published version
 @main.route('/test_notification')
 @login_required
 def test_notification():
@@ -923,7 +1016,7 @@ def test_notification():
     send_push_to_technician(
         tech.id,
         "Test Notification",
-        "This is a test push notification from Workshop Manager 🚗",
+        "Test notification from Workshop Manager",
         url="/staff"
     )
     flash("Test notification sent. Check your device.", "success")
@@ -991,19 +1084,3 @@ def admin_action(job_id, action):
     flash(f"Admin action '{action}' performed on job {job.id}.", "info")
     return redirect(url_for('main.live_jobs'))
 
-
-# ------------------- ERROR HANDLING -------------------
-
-# Custom error 404 not found page
-@main.errorhandler(404)
-def page_not_found(e):
-    flash("Page not found. Please check the URL.", "error")
-    return render_template("404.html"), 404
-
-
-# Custom error 500 internal server error page
-@main.errorhandler(500)
-def internal_error(e):
-    db.session.rollback()
-    flash("An unexpected error occurred. Please try again.", "error")
-    return render_template("500.html"), 500
